@@ -1,67 +1,208 @@
 <!DOCTYPE html>
-<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>IT Hub</title>
+
 <style>
-body{font-family:Arial;margin:0;background:#111827;color:#fff}
-#app{display:flex;height:100vh}
-#left{width:220px;background:#1f2937;padding:15px}
-#right{flex:1;padding:20px}
-input,textarea{width:100%;margin:6px 0;padding:8px}
-textarea{height:250px}
-button{padding:8px 14px;margin:4px}
-li{cursor:pointer}
+body{
+    font-family:Arial;
+    margin:0;
+    background:#111827;
+    color:#fff;
+    display:none;
+}
+
+#app{
+    display:flex;
+    height:100vh;
+}
+
+#left{
+    width:220px;
+    background:#1f2937;
+    padding:15px;
+}
+
+#right{
+    flex:1;
+    padding:20px;
+}
+
+input,textarea{
+    width:100%;
+    margin:6px 0;
+    padding:8px;
+    box-sizing:border-box;
+}
+
+textarea{
+    height:250px;
+}
+
+button{
+    padding:8px 14px;
+    margin:4px;
+}
+
+li{
+    cursor:pointer;
+    margin:6px 0;
+}
 </style>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head><body>
+
+</head>
+<body>
+
 <div id="app">
+
 <div id="left">
 <h3>글목록</h3>
+
 <ul id="list"></ul>
+
 <button onclick="loadPosts()">새로고침</button>
+
 </div>
+
 <div id="right">
+
 <input id="title" placeholder="제목">
-<textarea id="content" placeholder="내용"></textarea><br>
+
+<textarea id="content" placeholder="내용"></textarea>
+
+<br>
+
 <button onclick="save()">저장</button>
 <button onclick="del()">삭제</button>
+
 </div>
+
 </div>
+
 <script>
+
+const PASSWORD = "8787";
+
+function checkPassword(){
+
+    const pw = prompt("암호를 입력하세요");
+
+    if(pw === PASSWORD){
+
+        document.body.style.display = "block";
+        loadPosts();
+
+    }else{
+
+        alert("암호가 틀렸습니다.");
+
+        document.body.innerHTML = `
+        <div style="
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+        font-size:30px;">
+        접근이 거부되었습니다.
+        </div>`;
+
+    }
+
+}
+
 const url="https://nokkpkrgwashmjykgpha.supabase.co";
 const key="sb_publishable_aSoCddigVMqoOL7b5kbJ6w_WrWuSMVT";
+
 const db=supabase.createClient(url,key);
+
 let current=null;
 
 async function loadPosts(){
- const {data}=await db.from("posts").select("*").order("id");
- list.innerHTML="";
- (data||[]).forEach(r=>{
-  let li=document.createElement("li");
-  li.textContent=r.title;
-  li.onclick=()=>{current=r.id;title.value=r.title;content.value=r.content}
-  list.appendChild(li);
- });
+
+    const {data}=await db
+    .from("posts")
+    .select("*")
+    .order("id");
+
+    list.innerHTML="";
+
+    (data||[]).forEach(r=>{
+
+        let li=document.createElement("li");
+
+        li.textContent=r.title;
+
+        li.onclick=()=>{
+
+            current=r.id;
+
+            title.value=r.title;
+            content.value=r.content;
+
+        };
+
+        list.appendChild(li);
+
+    });
+
 }
 
 async function save(){
- let obj={title:title.value,content:content.value};
- if(current){
-   await db.from("posts").update(obj).eq("id",current);
- }else{
-   await db.from("posts").insert(obj);
- }
- current=null;
- title.value="";content.value="";
- loadPosts();
+
+    let obj={
+        title:title.value,
+        content:content.value
+    };
+
+    if(current){
+
+        await db
+        .from("posts")
+        .update(obj)
+        .eq("id",current);
+
+    }else{
+
+        await db
+        .from("posts")
+        .insert(obj);
+
+    }
+
+    current=null;
+
+    title.value="";
+    content.value="";
+
+    loadPosts();
+
 }
 
 async function del(){
- if(!current)return;
- await db.from("posts").delete().eq("id",current);
- current=null;
- title.value="";content.value="";
- loadPosts();
+
+    if(!current) return;
+
+    await db
+    .from("posts")
+    .delete()
+    .eq("id",current);
+
+    current=null;
+
+    title.value="";
+    content.value="";
+
+    loadPosts();
+
 }
-loadPosts();
+
+checkPassword();
+
 </script>
-</body></html>
+
+</body>
+</html>
