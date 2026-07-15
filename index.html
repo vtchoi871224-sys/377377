@@ -2,489 +2,66 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BBsdAssssssssAs그래프 — 나이에 따른 다섯 가지 곡선</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tech Insight Hub</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans+KR:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-
-  :root{
-    --bg:#14171F;
-    --surface:#1C212C;
-    --surface-2:#242A38;
-    --line:#333B4C;
-    --text:#EDEAE3;
-    --text-dim:#9099AD;
-    --gold:#C9A227;
-    --teal:#4F9C93;
-    --rose:#C97064;
-    --violet:#8B7EC8;
-    --sand:#D8C9A3;
-  }
-
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:'IBM Plex Sans KR', sans-serif;
-    min-height:100vh;
-    overflow-x:hidden;
-  }
-
-  .wrap{
-    max-width:980px;
-    margin:0 auto;
-    padding:56px 24px 90px;
-  }
-
-  header{
-    margin-bottom:40px;
-  }
-  .eyebrow{
-    font-family:'JetBrains Mono', monospace;
-    font-size:12px;
-    letter-spacing:0.14em;
-    color:var(--gold);
-    text-transform:uppercase;
-    margin-bottom:14px;
-  }
-  h1{
-    font-family:'Newsreader', serif;
-    font-weight:600;
-    font-size:clamp(32px,5vw,52px);
-    line-height:1.15;
-    margin:0 0 16px;
-    letter-spacing:-0.01em;
-  }
-  h1 em{
-    font-style:italic;
-    color:var(--gold);
-  }
-  .sub{
-    color:var(--text-dim);
-    font-size:15.5px;
-    line-height:1.65;
-    max-width:600px;
-  }
-
-  .panel{
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:14px;
-    padding:28px 28px 20px;
-  }
-
-  .chart-area{
-    position:relative;
-  }
-  svg{
-    width:100%;
-    height:auto;
-    display:block;
-    overflow:visible;
-  }
-
-  .axis-label{
-    font-family:'JetBrains Mono', monospace;
-    font-size:11px;
-    fill:var(--text-dim);
-  }
-  .grid-line{
-    stroke:var(--line);
-    stroke-width:1;
-  }
-  .curve{
-    fill:none;
-    stroke-width:2.4;
-    stroke-linecap:round;
-    stroke-linejoin:round;
-    transition:opacity .25s ease;
-  }
-  .curve.dim{ opacity:.12; }
-
-  .now-line{
-    stroke:var(--sand);
-    stroke-width:1.4;
-    stroke-dasharray:3 4;
-  }
-  .now-dot{
-    stroke:var(--bg);
-    stroke-width:2;
-  }
-
-  .legend{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin:22px 0 6px;
-  }
-  .chip{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    padding:7px 12px;
-    border-radius:999px;
-    border:1px solid var(--line);
-    background:var(--surface-2);
-    font-size:13px;
-    cursor:pointer;
-    user-select:none;
-    color:var(--text);
-    transition:opacity .2s ease, border-color .2s ease;
-  }
-  .chip.off{ opacity:.35; }
-  .chip .dot{
-    width:9px;height:9px;border-radius:50%;
-    flex-shrink:0;
-  }
-
-  .slider-row{
-    margin-top:26px;
-  }
-  input[type=range]{
-    width:100%;
-    -webkit-appearance:none;
-    appearance:none;
-    height:4px;
-    background:var(--line);
-    border-radius:2px;
-    outline:none;
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;
-    width:18px;height:18px;
-    border-radius:50%;
-    background:var(--sand);
-    border:3px solid var(--bg);
-    box-shadow:0 0 0 1px var(--sand);
-    cursor:pointer;
-    margin-top:-7px;
-  }
-  input[type=range]::-moz-range-thumb{
-    width:18px;height:18px;
-    border-radius:50%;
-    background:var(--sand);
-    border:3px solid var(--bg);
-    cursor:pointer;
-  }
-
-  .age-readout{
-    font-family:'JetBrains Mono', monospace;
-    font-size:13px;
-    color:var(--text-dim);
-    display:flex;
-    justify-content:space-between;
-    margin-top:8px;
-  }
-  .age-readout .big{
-    color:var(--sand);
-    font-size:15px;
-  }
-
-  .insight{
-    margin-top:34px;
-    display:grid;
-    grid-template-columns:110px 1fr;
-    gap:22px;
-    align-items:start;
-  }
-  .stage-tag{
-    font-family:'JetBrains Mono', monospace;
-    font-size:12px;
-    color:var(--gold);
-    padding-top:4px;
-  }
-  .stage-title{
-    font-family:'Newsreader', serif;
-    font-size:22px;
-    font-weight:600;
-    margin:0 0 8px;
-  }
-  .stage-text{
-    color:var(--text-dim);
-    font-size:14.5px;
-    line-height:1.7;
-    margin:0;
-  }
-
-  .stats{
-    margin-top:26px;
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:10px;
-  }
-  .stat{
-    background:var(--surface-2);
-    border-radius:10px;
-    padding:12px 12px 14px;
-    border:1px solid var(--line);
-  }
-  .stat .label{
-    font-size:11.5px;
-    color:var(--text-dim);
-    margin-bottom:8px;
-    display:flex;
-    align-items:center;
-    gap:6px;
-  }
-  .stat .label .dot{ width:7px;height:7px;border-radius:50%; }
-  .stat .bar-track{
-    height:5px;
-    background:var(--line);
-    border-radius:3px;
-    overflow:hidden;
-  }
-  .stat .bar-fill{
-    height:100%;
-    border-radius:3px;
-    transition:width .15s ease;
-  }
-  .stat .value{
-    font-family:'JetBrains Mono', monospace;
-    font-size:13px;
-    margin-top:7px;
-  }
-
-  footer{
-    margin-top:30px;
-    color:var(--text-dim);
-    font-size:12.5px;
-    line-height:1.6;
-  }
-
-  @media (max-width:640px){
-    .insight{ grid-template-columns:1fr; }
-    .stats{ grid-template-columns:repeat(2,1fr); }
-    .stage-tag{ padding-top:0; }
-  }
+body{margin:0;font-family:Arial,sans-serif;background:#0f172a;color:#e5e7eb}
+header{padding:30px;background:#111827}
+h1{margin:0;color:#60a5fa}
+.sub{color:#cbd5e1}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;padding:20px}
+.card{background:#1e293b;padding:18px;border-radius:12px;border:1px solid #334155}
+.card h2{margin-top:0;color:#38bdf8}
+.tag{display:inline-block;background:#2563eb;padding:4px 10px;border-radius:20px;font-size:12px}
+footer{padding:20px;color:#94a3b8;text-align:center}
 </style>
 </head>
 <body>
+<header>
+<h1>💻 Tech Insight Hub</h1>
+<p class="sub">최신 IT 기술과 트렌드를 한눈에 확인하는 정보 사이트 예시</p>
+</header>
 
-<div class="wrap">
-  <header>
-    <div class="eyebrow">Life Graph · 5 Curves, 1 Timeline</div>
-    <h1>당신의 인생은<br><em>다섯 개의 곡선</em>이 겹쳐 흐른다</h1>
-    <p class="sub">신체 능력, 지혜, 사회적 관계, 경제력, 행복도 — 나이를 슬라이더로 움직이며 각 곡선이 어떻게 오르내리는지 확인해보세요. 값은 여러 발달심리학·경제학 연구에서 관찰된 일반적 경향을 단순화한 예시입니다.</p>
-  </header>
-
-  <div class="panel">
-    <div class="chart-area">
-      <svg id="chart" viewBox="0 0 900 380" preserveAspectRatio="xMidYMid meet"></svg>
-    </div>
-
-    <div class="legend" id="legend"></div>
-
-    <div class="slider-row">
-      <input type="range" id="ageSlider" min="0" max="100" value="27" step="1">
-      <div class="age-readout">
-        <span>0세</span>
-        <span class="big" id="ageBig">만 27세</span>
-        <span>100세</span>
-      </div>
-    </div>
-
-    <div class="insight">
-      <div class="stage-tag" id="stageTag">20대</div>
-      <div>
-        <h3 class="stage-title" id="stageTitle">확장의 시기</h3>
-        <p class="stage-text" id="stageText"></p>
-      </div>
-    </div>
-
-    <div class="stats" id="stats"></div>
-  </div>
-
-  <footer>
-    ※ 이 그래프는 통계적 평균의 경향을 그린 예시 모델이며, 개인의 인생 곡선은 이와 다르게 흘러갑니다. 특히 행복도의 U자형 곡선은 다수의 삶의 만족도 조사에서 반복적으로 관찰되는 패턴을 단순화한 것입니다.
-  </footer>
+<section class="grid">
+<div class="card">
+<span class="tag">AI</span>
+<h2>생성형 AI</h2>
+<p>대규모 언어모델(LLM), AI 에이전트, 멀티모달 AI가 기업 업무 자동화와 검색, 개발 환경을 빠르게 바꾸고 있습니다.</p>
 </div>
 
-<script>
-const CURVES = [
-  { key:'physical', label:'신체 능력', color:'var(--rose)', hex:'#C97064',
-    points:[[0,8],[10,45],[20,92],[30,88],[40,74],[50,60],[60,46],[70,34],[80,22],[90,13],[100,7]] },
-  { key:'wisdom', label:'지혜·경험', color:'var(--gold)', hex:'#C9A227',
-    points:[[0,3],[10,12],[20,30],[30,50],[40,66],[50,80],[60,90],[70,94],[80,92],[90,86],[100,78]] },
-  { key:'social', label:'사회적 관계', color:'var(--violet)', hex:'#8B7EC8',
-    points:[[0,20],[10,55],[20,78],[30,86],[40,80],[50,70],[60,62],[70,58],[80,48],[90,36],[100,26]] },
-  { key:'wealth', label:'경제력', color:'var(--teal)', hex:'#4F9C93',
-    points:[[0,2],[10,4],[20,18],[30,38],[40,58],[50,76],[60,86],[70,80],[80,66],[90,52],[100,40]] },
-  { key:'happiness', label:'행복도', color:'var(--sand)', hex:'#D8C9A3',
-    points:[[0,60],[10,72],[20,68],[30,58],[40,48],[50,45],[60,55],[70,68],[80,74],[90,70],[100,60]] },
-];
+<div class="card">
+<span class="tag">Cloud</span>
+<h2>클라우드 & Kubernetes</h2>
+<p>컨테이너 기반 서비스와 Kubernetes는 대규모 서비스 운영의 핵심 기술입니다. GitOps와 IaC도 함께 활용됩니다.</p>
+</div>
 
-const STAGES = [
-  { max:9,  tag:'유년기', title:'세계를 처음 배우는 시기',
-    text:'신체와 사회성이 빠르게 자라지만 경제력과 지혜는 아직 축적되기 전입니다. 행복도는 대체로 높게 나타나는 시기이기도 합니다.' },
-  { max:19, tag:'청소년기', title:'신체 능력이 정점을 향해',
-    text:'신체 능력이 가파르게 상승하고 사회적 관계가 폭발적으로 확장됩니다. 정체성과 자아를 탐색하며 지혜의 축적이 본격적으로 시작됩니다.' },
-  { max:29, tag:'20대', title:'확장의 시기',
-    text:'신체 능력이 정점에 가까워지고, 사회적 관계망도 최고치에 다다릅니다. 반면 경제력은 아직 낮아 이상과 현실의 간극을 자주 느끼는 시기입니다.' },
-  { max:39, tag:'30대', title:'축적이 시작되는 시기',
-    text:'경제력과 지혜가 본격적으로 쌓이기 시작하지만, 신체 능력은 서서히 하강 곡선에 접어듭니다. 행복도가 통계적으로 가장 낮아지는 구간의 초입이기도 합니다.' },
-  { max:49, tag:'40대', title:'책임이 가장 무거운 시기',
-    text:'경제력과 지혜는 꾸준히 상승하지만, 여러 삶의 만족도 조사에서 행복도가 저점에 가까워지는 구간으로 나타납니다 — 이른바 "중년의 U자 곡선" 바닥입니다.' },
-  { max:59, tag:'50대', title:'정점을 향한 마지막 상승',
-    text:'경제력이 정점에 다가서고 지혜도 계속 쌓입니다. 흥미롭게도 이 시점부터 행복도는 다시 완만히 반등하기 시작합니다.' },
-  { max:69, tag:'60대', title:'전환의 시기',
-    text:'지혜가 정점에 이르고 경제력은 완만히 하강을 시작합니다(은퇴 등의 영향). 신체 능력은 뚜렷이 낮아지지만 행복도는 오히려 상승세를 이어갑니다.' },
-  { max:79, tag:'70대', title:'응축의 시기',
-    text:'신체 능력과 경제력은 계속 낮아지지만, 지혜는 여전히 높은 수준에서 유지됩니다. 많은 연구에서 이 시기의 삶의 만족도는 청년기 못지않게 높게 나타납니다.' },
-  { max:100, tag:'80대 이후', title:'본질만 남는 시기',
-    text:'신체 능력은 크게 낮아지지만, 사회적 유대와 행복도는 상대적으로 높게 유지되는 경우가 많습니다. 무엇이 삶에서 진짜 중요했는지가 선명해지는 시기입니다.' },
-];
+<div class="card">
+<span class="tag">Security</span>
+<h2>사이버 보안</h2>
+<p>Zero Trust, Passkey, EDR/XDR, AI 기반 보안 분석이 최신 보안 환경의 중심입니다.</p>
+</div>
 
-function catmullRom2bezier(points){
-  let d = `M ${points[0][0]} ${points[0][1]}`;
-  for(let i=0;i<points.length-1;i++){
-    const p0 = points[i===0?0:i-1];
-    const p1 = points[i];
-    const p2 = points[i+1];
-    const p3 = points[i+2===points.length+1?i:Math.min(i+2,points.length-1)];
-    const cp1x = p1[0] + (p2[0]-p0[0])/6;
-    const cp1y = p1[1] + (p2[1]-p0[1])/6;
-    const cp2x = p2[0] - (p3[0]-p1[0])/6;
-    const cp2y = p2[1] - (p3[1]-p1[1])/6;
-    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2[0]} ${p2[1]}`;
-  }
-  return d;
-}
+<div class="card">
+<span class="tag">Hardware</span>
+<h2>차세대 하드웨어</h2>
+<p>AI GPU, NPU 탑재 PC, PCIe 5.0 SSD, DDR5 메모리, Wi‑Fi 7이 고성능 컴퓨팅을 이끌고 있습니다.</p>
+</div>
 
-const PAD_L = 46, PAD_R = 20, PAD_T = 20, PAD_B = 36;
-const W = 900, H = 380;
-const plotW = W - PAD_L - PAD_R;
-const plotH = H - PAD_T - PAD_B;
+<div class="card">
+<span class="tag">Development</span>
+<h2>개발 트렌드</h2>
+<p>Rust, Go, Python, TypeScript와 AI 코딩 도구를 활용한 개발 생산성이 빠르게 향상되고 있습니다.</p>
+</div>
 
-function toSvgPoints(points){
-  return points.map(([age,val])=>[
-    PAD_L + (age/100)*plotW,
-    PAD_T + (1 - val/100)*plotH
-  ]);
-}
+<div class="card">
+<span class="tag">Future</span>
+<h2>미래 기술</h2>
+<p>양자컴퓨팅, 디지털 트윈, 자율주행, 로봇, 공간컴퓨팅(XR)이 차세대 산업을 이끌 핵심 기술로 주목받고 있습니다.</p>
+</div>
+</section>
 
-function interpolate(points, age){
-  for(let i=0;i<points.length-1;i++){
-    const [a0,v0] = points[i];
-    const [a1,v1] = points[i+1];
-    if(age>=a0 && age<=a1){
-      const t = (age-a0)/(a1-a0);
-      return v0 + (v1-v0)*t;
-    }
-  }
-  return points[points.length-1][1];
-}
-
-const svg = document.getElementById('chart');
-svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-
-let ns = 'http://www.w3.org/2000/svg';
-function el(tag, attrs){
-  const e = document.createElementNS(ns, tag);
-  for(const k in attrs) e.setAttribute(k, attrs[k]);
-  return e;
-}
-
-// grid lines + axis labels (decades)
-for(let age=0; age<=100; age+=10){
-  const x = PAD_L + (age/100)*plotW;
-  svg.appendChild(el('line', {
-    x1:x, y1:PAD_T, x2:x, y2:PAD_T+plotH, class:'grid-line'
-  }));
-  const t = el('text', {x:x, y:H-12, class:'axis-label', 'text-anchor':'middle'});
-  t.textContent = age;
-  svg.appendChild(t);
-}
-// horizontal baseline
-svg.appendChild(el('line', {x1:PAD_L, y1:PAD_T+plotH, x2:PAD_L+plotW, y2:PAD_T+plotH, class:'grid-line'}));
-
-const curveEls = {};
-CURVES.forEach(c=>{
-  const pts = toSvgPoints(c.points);
-  const path = el('path', {
-    d: catmullRom2bezier(pts),
-    class:'curve',
-    stroke: c.hex
-  });
-  svg.appendChild(path);
-  curveEls[c.key] = path;
-});
-
-// now-line group
-const nowLine = el('line', {x1:0,y1:PAD_T,x2:0,y2:PAD_T+plotH, class:'now-line'});
-svg.appendChild(nowLine);
-const nowDots = {};
-CURVES.forEach(c=>{
-  const dot = el('circle', {r:5, class:'now-dot', fill:c.hex});
-  svg.appendChild(dot);
-  nowDots[c.key] = dot;
-});
-
-// legend
-const legendEl = document.getElementById('legend');
-const active = {};
-CURVES.forEach(c=>{
-  active[c.key] = true;
-  const chip = document.createElement('div');
-  chip.className = 'chip';
-  chip.innerHTML = `<span class="dot" style="background:${c.hex}"></span>${c.label}`;
-  chip.addEventListener('click', ()=>{
-    active[c.key] = !active[c.key];
-    chip.classList.toggle('off', !active[c.key]);
-    curveEls[c.key].classList.toggle('dim', !active[c.key]);
-    nowDots[c.key].style.opacity = active[c.key] ? 1 : 0.12;
-  });
-  legendEl.appendChild(chip);
-});
-
-// stats
-const statsEl = document.getElementById('stats');
-const statFills = {};
-const statVals = {};
-CURVES.forEach(c=>{
-  const div = document.createElement('div');
-  div.className = 'stat';
-  div.innerHTML = `
-    <div class="label"><span class="dot" style="background:${c.hex}"></span>${c.label}</div>
-    <div class="bar-track"><div class="bar-fill" style="background:${c.hex}"></div></div>
-    <div class="value">0</div>
-  `;
-  statsEl.appendChild(div);
-  statFills[c.key] = div.querySelector('.bar-fill');
-  statVals[c.key] = div.querySelector('.value');
-});
-
-const slider = document.getElementById('ageSlider');
-const ageBig = document.getElementById('ageBig');
-const stageTag = document.getElementById('stageTag');
-const stageTitle = document.getElementById('stageTitle');
-const stageText = document.getElementById('stageText');
-
-function render(age){
-  const x = PAD_L + (age/100)*plotW;
-  nowLine.setAttribute('x1', x);
-  nowLine.setAttribute('x2', x);
-
-  CURVES.forEach(c=>{
-    const val = interpolate(c.points, age);
-    const y = PAD_T + (1 - val/100)*plotH;
-    nowDots[c.key].setAttribute('cx', x);
-    nowDots[c.key].setAttribute('cy', y);
-    statFills[c.key].style.width = Math.round(val) + '%';
-    statVals[c.key].textContent = Math.round(val);
-  });
-
-  ageBig.textContent = `만 ${age}세`;
-
-  const stage = STAGES.find(s => age <= s.max);
-  stageTag.textContent = stage.tag;
-  stageTitle.textContent = stage.title;
-  stageText.textContent = stage.text;
-}
-
-slider.addEventListener('input', e => render(Number(e.target.value)));
-render(Number(slider.value));
-</script>
-
+<footer>
+Tech Insight Hub · 최신 기술 소개용 샘플 페이지
+</footer>
 </body>
 </html>
