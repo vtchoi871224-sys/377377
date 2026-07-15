@@ -1,93 +1,67 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IT Knowledge Hub</title>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IT Hub</title>
 <style>
-body{margin:0;background:#0f172a;color:#fff;font-family:Arial,sans-serif}
-header{padding:20px;background:#111827}
-h1{margin:0}
-.container{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
-nav{background:#1e293b;padding:15px}
-nav button{display:block;width:100%;margin:8px 0;padding:10px;border:0;border-radius:8px;background:#334155;color:#fff;cursor:pointer}
-main{padding:20px}
-textarea{width:100%;height:220px;background:#0b1220;color:#fff;border:1px solid #475569;border-radius:8px;padding:10px}
-.controls{margin-top:10px}
-button.action{padding:10px 16px;margin-right:10px;border:0;border-radius:8px;background:#2563eb;color:#fff;cursor:pointer}
+body{font-family:Arial;margin:0;background:#111827;color:#fff}
+#app{display:flex;height:100vh}
+#left{width:220px;background:#1f2937;padding:15px}
+#right{flex:1;padding:20px}
+input,textarea{width:100%;margin:6px 0;padding:8px}
+textarea{height:250px}
+button{padding:8px 14px;margin:4px}
+li{cursor:pointer}
 </style>
-</head>
-<body>
-<header><h1>💻 IT Knowledge Hub</h1></header>
-<div class="container">
-<nav>
-<button onclick="loadTopic('ai')">🤖 생성형 AI</button>
-<button onclick="loadTopic('security')">🔒 보안</button>
-<button onclick="loadTopic('cloud')">☁️ 클라우드</button>
-<button onclick="loadTopic('hardware')">🖥️ 하드웨어</button>
-<button onclick="loadTopic('future')">🚀 미래기술</button>
-</nav>
-<main>
-<h2 id="title">주제를 선택하세요.</h2>
-<textarea id="editor"></textarea>
-<div class="controls">
-<button class="action" onclick="save()">💾 저장</button>
-<button class="action" onclick="newDoc()">📄 새 글</button>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head><body>
+<div id="app">
+<div id="left">
+<h3>글목록</h3>
+<ul id="list"></ul>
+<button onclick="loadPosts()">새로고침</button>
 </div>
-</main>
+<div id="right">
+<input id="title" placeholder="제목">
+<textarea id="content" placeholder="내용"></textarea><br>
+<button onclick="save()">저장</button>
+<button onclick="del()">삭제</button>
+</div>
 </div>
 <script>
-const data={
-ai:`# 생성형 AI
+const url="https://nokkpkrgwashmjykgpha.supabase.co";
+const key="여기에_본인의_Publishable_Key";
+const db=supabase.createClient(url,key);
+let current=null;
 
-- LLM
-- AI Agent
-- 멀티모달 AI
-- 기업 자동화
-`,
-security:`# 보안
-
-- Zero Trust
-- Passkey
-- EDR/XDR
-- 랜섬웨어 대응
-`,
-cloud:`# 클라우드
-
-- Kubernetes
-- Docker
-- GitOps
-- IaC
-`,
-hardware:`# 하드웨어
-
-- DDR5
-- PCIe 5.0 SSD
-- AI PC(NPU)
-- Wi-Fi 7
-`,
-future:`# 미래기술
-
-- 양자컴퓨팅
-- 휴머노이드
-- 디지털 트윈
-- XR
-`
-};
-function loadTopic(k){
-document.getElementById("title").innerText=k.toUpperCase();
-document.getElementById("editor").value=localStorage.getItem(k)||data[k];
-window.current=k;
+async function loadPosts(){
+ const {data}=await db.from("posts").select("*").order("id");
+ list.innerHTML="";
+ (data||[]).forEach(r=>{
+  let li=document.createElement("li");
+  li.textContent=r.title;
+  li.onclick=()=>{current=r.id;title.value=r.title;content.value=r.content}
+  list.appendChild(li);
+ });
 }
-window.current="ai";
-loadTopic("ai");
-function save(){
-localStorage.setItem(window.current,document.getElementById("editor").value);
-alert("저장되었습니다.");
+
+async function save(){
+ let obj={title:title.value,content:content.value};
+ if(current){
+   await db.from("posts").update(obj).eq("id",current);
+ }else{
+   await db.from("posts").insert(obj);
+ }
+ current=null;
+ title.value="";content.value="";
+ loadPosts();
 }
-function newDoc(){
-document.getElementById("editor").value="";
+
+async function del(){
+ if(!current)return;
+ await db.from("posts").delete().eq("id",current);
+ current=null;
+ title.value="";content.value="";
+ loadPosts();
 }
+loadPosts();
 </script>
-</body>
-</html>
+</body></html>
