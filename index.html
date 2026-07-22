@@ -92,7 +92,9 @@ function checkPassword(){
     const pw = prompt("암호를 입력하세요");
 
     if(pw === PASSWORD){
+    
 
+        document.body.style.display = "block";
         document.getElementById("app").style.display = "flex";
         loadPosts();
 
