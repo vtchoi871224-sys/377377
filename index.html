@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>aaaa3 Hub</title>
+<title>aaatesta3 Hub</title>
 
 <style>
 body{
@@ -93,21 +93,21 @@ function checkPassword(){
 
     if(pw === PASSWORD){
 
-        document.body.style.display = "block";
+        document.getElementById("app").style.display = "flex";
         loadPosts();
 
     }else{
 
-        alert("암호가 틀렸습니다.");
-
         document.body.innerHTML = `
         <div style="
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        height:100vh;
-        font-size:30px;">
-        접근이 거부되었습니다.
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+            font-size:30px;
+            background:#111827;
+            color:white;">
+            접근이 거부되었습니다.
         </div>`;
 
     }
