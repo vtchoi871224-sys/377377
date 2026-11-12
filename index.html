@@ -1,251 +1,175 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IT Hub - 코드 메모장</title>
-
-<style>
-:root{
-    --bg:#0b1220;
-    --panel:#151f31;
-    --panel2:#1c2940;
-    --line:#2b3a52;
-    --text:#e8eef8;
-    --muted:#9aabc3;
-    --accent:#60a5fa;
-}
-*{box-sizing:border-box}
-body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font-family:"맑은 고딕",Arial,sans-serif;
-}
-header{
-    min-height:88px;
-    padding:18px 4%;
-    border-bottom:1px solid var(--line);
-    background:#101a2b;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:18px;
-}
-.brand h1{margin:0;font-size:24px}
-.brand p{margin:7px 0 0;color:var(--muted);font-size:13px}
-
-.stats{
-    display:flex;
-    align-items:stretch;
-    gap:9px;
-    flex-wrap:wrap;
-    justify-content:flex-end;
-}
-.stat{
-    min-width:105px;
-    padding:9px 12px;
-    background:var(--panel2);
-    border:1px solid var(--line);
-    border-radius:10px;
-    text-align:center;
-}
-.stat-label{
-    display:block;
-    color:var(--muted);
-    font-size:11px;
-    margin-bottom:4px;
-}
-.stat-value{
-    font-size:19px;
-    font-weight:700;
-    font-variant-numeric:tabular-nums;
-}
-.stat-value.loading{
-    color:var(--muted);
-    font-size:14px;
-}
-
-main{
-    max-width:1200px;
-    margin:0 auto;
-    padding:26px clamp(14px,3vw,32px);
-}
-.toolbar{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    align-items:center;
-    margin-bottom:18px;
-}
-.tab{
-    border:1px solid var(--line);
-    background:var(--panel);
-    color:var(--text);
-    padding:10px 16px;
-    border-radius:9px;
-    cursor:pointer;
-}
-.tab.active{
-    background:#1d4b7e;
-    border-color:#397fc0;
-}
-.search{
-    margin-left:auto;
-    max-width:280px;
-    min-width:180px;
-    padding:10px 12px;
-    border-radius:9px;
-    border:1px solid var(--line);
-    background:var(--panel);
-    color:var(--text);
-}
-.memo{
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:14px;
-    overflow:hidden;
-    margin-bottom:20px;
-}
-.memo-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-    padding:15px 18px;
-    background:var(--panel2);
-    border-bottom:1px solid var(--line);
-}
-.memo-head h2{font-size:16px;margin:0}
-.meta{font-size:12px;color:var(--muted);margin-top:4px}
-.actions{display:flex;gap:8px;flex-wrap:wrap}
-button.action{
-    border:0;
-    border-radius:8px;
-    padding:9px 13px;
-    font-weight:600;
-    cursor:pointer;
-    background:var(--accent);
-    color:#071426;
-}
-button.action:active{transform:scale(.98)}
-pre{
-    margin:0;
-    padding:18px;
-    overflow:auto;
-    max-height:62vh;
-    line-height:1.55;
-    font:13px/1.6 Consolas,"Cascadia Code",monospace;
-    white-space:pre;
-}
-pre code{color:#dce8f8}
-.empty{
-    display:none;
-    color:var(--muted);
-    padding:24px;
-    text-align:center;
-}
-.toast{
-    position:fixed;
-    bottom:22px;
-    left:50%;
-    transform:translateX(-50%);
-    background:#123d35;
-    color:#d1fae5;
-    padding:11px 18px;
-    border:1px solid #23745f;
-    border-radius:10px;
-    opacity:0;
-    pointer-events:none;
-    transition:.2s;
-}
-.toast.show{opacity:1}
-footer{
-    text-align:center;
-    color:var(--muted);
-    font-size:12px;
-    padding:10px 20px 28px;
-}
-
-@media(max-width:700px){
-    header{
-        align-items:flex-start;
-        flex-direction:column;
-    }
-    .stats{
-        width:100%;
-        justify-content:flex-start;
-    }
-    .stat{
-        flex:1;
-        min-width:90px;
-    }
-}
-@media(max-width:600px){
-    .memo-head{
-        align-items:flex-start;
-        flex-direction:column;
-    }
-    .search{
-        margin-left:0;
-        max-width:none;
-        width:100%;
-    }
-    pre{font-size:12px}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT 명령어 아카이브</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Malgun Gothic', 'sans-serif'],
+                        mono: ['Consolas', 'Courier New', monospace]
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome 아이콘 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 커스텀 스크롤바 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
 </head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-300 font-sans">
 
-<body>
-
-<header>
-    <div class="brand">
-        <h1>📝 IT Hub 코드 메모장</h1>
-        <p>자주 사용하는 스크립트를 보관하고 버튼 한 번으로 복사하세요.</p>
-    </div>
-
-    <div class="stats">
-        <div class="stat">
-            <span class="stat-label">누적 방문자</span>
-            <span class="stat-value loading" id="totalVisitors">집계 중</span>
-        </div>
-        <div class="stat">
-            <span class="stat-label">오늘 방문자</span>
-            <span class="stat-value loading" id="todayVisitors">집계 중</span>
-        </div>
-        <div class="stat">
-            <span class="stat-label">페이지 조회수</span>
-            <span class="stat-value loading" id="pageViews">집계 중</span>
-        </div>
-        <div class="stat">
-            <span class="stat-label">현재 접속자</span>
-            <span class="stat-value loading" id="activeVisitors">집계 중</span>
-        </div>
-    </div>
-</header>
-
-<main>
-    <div class="toolbar">
-        <button class="tab active" data-filter="all">전체 메모</button>
-        <button class="tab" data-filter="powershell">PowerShell</button>
-        <input class="search" id="search" type="search" placeholder="메모 검색...">
-    </div>
-
-    <section class="memo" data-type="powershell">
-        <div class="memo-head">
-            <div>
-                <h2>노트북 장비 정보 수집 GUI</h2>
-                <div class="meta">
-                    PowerShell · 장비 정보 표시 및 K 키 종료
+    <!-- 상단 네비게이션바 -->
+    <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="resetFilter()">
+                <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-terminal text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-tight">IT Command Vault</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">시스템 관리 및 스크립트 아카이브</p>
                 </div>
             </div>
-            <div class="actions">
-                <button class="action" onclick="copyCode('psCode',this)">
-                    📋 코드 전체 복사
+            
+            <div class="flex items-center space-x-3">
+                <button onclick="openAddModal()" class="inline-flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-sm transition-all transform active:scale-95">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden sm:inline">스크립트 등록</span>
+                </button>
+                <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" title="테마 변경">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
                 </button>
             </div>
         </div>
-<pre><code id="psCode">Add-Type -AssemblyName System.Windows.Forms
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+        <!-- 검색 및 필터 영역 -->
+        <div class="space-y-4">
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-search"></i>
+                </span>
+                <input type="text" id="searchInput" oninput="filterCommands()" placeholder="명령어 제목, 설명 또는 코드 내용으로 검색..." class="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
+            </div>
+
+            <!-- 태그 필터 버튼 그룹 -->
+            <div id="tagFilterContainer" class="flex flex-wrap gap-2 items-center">
+                <!-- 동적으로 생성됨 -->
+            </div>
+        </div>
+
+        <!-- 명령어 카드 그리드 -->
+        <div id="commandGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 동적으로 주입됨 -->
+        </div>
+
+        <!-- 검색 결과 없음 안내 -->
+        <div id="noResults" class="hidden text-center py-16 space-y-3">
+            <div class="text-4xl text-slate-300 dark:text-slate-600">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">검색 결과가 없습니다. 다른 검색어를 입력해보세요.</p>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-500 dark:text-slate-400">
+        <p>&copy; 2026 IT Command Vault. All rights reserved.</p>
+    </footer>
+
+    <!-- 스크립트 추가 모달 -->
+    <div id="addModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-700 space-y-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">새 스크립트/명령어 등록</h3>
+                <button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="commandForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">제목</label>
+                    <input type="text" id="newTitle" required placeholder="예: 네트워크 어댑터 재시작" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">설명</label>
+                    <textarea id="newDesc" rows="2" required placeholder="이 스크립트나 명령어가 하는 일을 간략히 설명해주세요." class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">카테고리 / 태그 (콤마로 구분)</label>
+                        <input type="text" id="newTags" required placeholder="PowerShell, Windows, 네트워크" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">다운로드 확장자 (선택)</label>
+                        <select id="newExt" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="ps1">ps1 (PowerShell)</option>
+                            <option value="bat">bat (Batch)</option>
+                            <option value="sh">sh (Shell Script)</option>
+                            <option value="txt">txt (텍스트)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">코드 / 명령어 내용</label>
+                    <textarea id="newCode" rows="8" required placeholder="실행할 명령어 코드를 입력하세요..." class="w-full px-4 py-2.5 font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeAddModal()" class="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">취소</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium shadow-sm transition-all">등록하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 알림 토스트 메시지 -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-5 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm font-medium">
+        <i class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600"></i>
+        <span id="toastMessage">클립보드에 복사되었습니다!</span>
+    </div>
+
+    <!-- JavaScript 로직 -->
+    <script>
+        // 초기 데이터 (사용자가 요청한 첫 번째 노트북 장비 정보 스크립트 포함)
+        const defaultCommands = [
+            {
+                id: 'notebook-info-ps1',
+                title: '노트북 장비 정보 GUI 출력 스크립트',
+                description: 'Windows 시스템의 BIOS, 컴퓨터 시스템, 메인보드 정보 및 IP, MAC 주소를 수집하여 깔끔한 GUI 창으로 띄워주는 PowerShell 스크립트입니다. (K 키로 종료 가능)',
+                tags: ['PowerShell', 'Windows', 'GUI', '장비정보'],
+                extension: 'ps1',
+                code: `Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 # 1. 장비 정보 수집
@@ -341,99 +265,266 @@ $form.Add_KeyDown({
 })
 
 # 8. GUI 실행
-[void]$form.ShowDialog()</code></pre>
-    </section>
+[void]$form.ShowDialog()`
+            },
+            {
+                id: 'net-flush-dns',
+                title: 'DNS 캐시 초기화 및 IP 갱신',
+                description: '네트워크 연결 오류나 DNS 문제 발생 시 사용하는 표준 Windows 네트워크 새로고침 명령어 모음입니다.',
+                tags: ['Windows', '네트워크', 'Cmd'],
+                extension: 'bat',
+                code: `ipconfig /flushdns
+ipconfig /release
+ipconfig /renew
+arp -d *
+nbtstat -R`
+            }
+        ];
 
-    <div class="empty" id="empty">
-        검색 결과가 없습니다.
-    </div>
-</main>
+        let commands = JSON.parse(localStorage.getItem('it_commands')) || defaultCommands;
+        let currentSelectedTag = '전체';
 
-<footer>IT Hub · 개인 코드 보관용</footer>
+        // 앱 초기화
+        window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            renderTags();
+            renderCommands();
+        });
 
-<div class="toast" id="toast">
-    클립보드에 복사했습니다.
-</div>
-
-<script>
-function initMockStats() {
-    let views = parseInt(localStorage.getItem('it_hub_views')) || 1530;
-    views++;
-    localStorage.setItem('it_hub_views', views);
-
-    const total = 12500 + views;
-    const today = 32 + (views % 10);
-    const active = Math.floor(Math.random() * 4) + 1;
-
-    document.getElementById("totalVisitors").textContent = total.toLocaleString();
-    document.getElementById("todayVisitors").textContent = today.toLocaleString();
-    document.getElementById("pageViews").textContent = views.toLocaleString();
-    document.getElementById("activeVisitors").textContent = active.toLocaleString();
-
-    document.querySelectorAll(".stat-value").forEach(el=>{
-        el.classList.remove("loading");
-    });
-}
-initMockStats();
-
-async function copyCode(id, button){
-    const text = document.getElementById(id).textContent;
-    try{
-        await navigator.clipboard.writeText(text);
-        button.textContent = "✓ 복사 완료";
-        document.getElementById("toast").classList.add("show");
-        
-        setTimeout(()=>{
-            button.textContent = "📋 코드 전체 복사";
-            document.getElementById("toast").classList.remove("show");
-        }, 1600);
-    }catch(e){
-        const area = document.createElement("textarea");
-        area.value = text;
-        document.body.appendChild(area);
-        area.select();
-        const ok = document.execCommand("copy");
-        area.remove();
-        
-        if(ok){
-            button.textContent = "✓ 복사 완료";
-            setTimeout(()=>{
-                button.textContent = "📋 코드 전체 복사";
-            }, 1600);
-        }else{
-            alert("복사에 실패했습니다. 코드를 선택해 직접 복사해 주세요.");
+        // 다크모드 초기화 및 토글
+        function initTheme() {
+            const isDark = localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('themeIcon').className = 'fa-solid fa-sun';
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('themeIcon').className = 'fa-solid fa-moon';
+            }
         }
-    }
-}
 
-let filter = "all";
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                icon.className = 'fa-solid fa-moon';
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                icon.className = 'fa-solid fa-sun';
+            }
+        }
 
-function update(){
-    const q = document.getElementById("search").value.toLowerCase();
-    let shown = 0;
-    
-    document.querySelectorAll(".memo").forEach(card=>{
-        const typeOK = filter === "all" || card.dataset.type === filter;
-        const textOK = card.innerText.toLowerCase().includes(q);
-        
-        card.style.display = typeOK && textOK ? "" : "none";
-        if(typeOK && textOK) shown++;
-    });
-    
-    document.getElementById("empty").style.display = shown ? "none" : "block";
-}
+        // 태그 목록 렌더링
+        function renderTags() {
+            const container = document.getElementById('tagFilterContainer');
+            const allTags = ['전체'];
+            commands.forEach(cmd => {
+                cmd.tags.forEach(tag => {
+                    if (!allTags.includes(tag)) allTags.push(tag);
+                });
+            });
 
-document.querySelectorAll(".tab").forEach(tab=>{
-    tab.addEventListener("click", ()=>{
-        document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-        tab.classList.add("active");
-        filter = tab.dataset.filter;
-        update();
-    });
-});
+            container.innerHTML = allTags.map(tag => {
+                const isActive = currentSelectedTag === tag;
+                const activeClass = isActive 
+                    ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30 border-transparent' 
+                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-400';
+                return `<button onclick="selectTag('${tag}')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all ${activeClass}">${tag}</button>`;
+            }).join('');
+        }
 
-document.getElementById("search").addEventListener("input", update);
-</script>
+        function selectTag(tag) {
+            currentSelectedTag = tag;
+            renderTags();
+            renderCommands();
+        }
 
+        function resetFilter() {
+            currentSelectedTag = '전체';
+            document.getElementById('searchInput').value = '';
+            renderTags();
+            renderCommands();
+        }
+
+        // 명령어 목록 렌더링
+        function renderCommands() {
+            const grid = document.getElementById('commandGrid');
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            const noResults = document.getElementById('noResults');
+
+            const filtered = commands.filter(cmd => {
+                const matchesTag = currentSelectedTag === '전체' || cmd.tags.includes(currentSelectedTag);
+                const matchesSearch = cmd.title.toLowerCase().includes(searchQuery) || 
+                                      cmd.description.toLowerCase().includes(searchQuery) || 
+                                      cmd.code.toLowerCase().includes(searchQuery);
+                return matchesTag && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            noResults.classList.add('hidden');
+            grid.innerHTML = filtered.map(cmd => {
+                const tagsHtml = cmd.tags.map(t => `<span class="px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-medium">${t}</span>`).join('');
+                
+                const cardId = cmd.id || 'cmd-' + Math.random().toString(36).substring(2, 9);
+
+                return `
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between gap-4">
+                                <h3 class="font-bold text-base text-slate-900 dark:text-slate-100 leading-snug">${escapeHtml(cmd.title)}</h3>
+                                <div class="flex items-center space-x-1 shrink-0">
+                                    <button onclick="copyCode('${cardId}')" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 text-xs font-medium transition-colors" title="코드 복사">
+                                        <i class="fa-regular fa-copy"></i>
+                                        <span>복사</span>
+                                    </button>
+                                    <button onclick="downloadCode('${cardId}')" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 text-xs font-medium transition-colors" title="파일 다운로드">
+                                        <i class="fa-solid fa-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">${escapeHtml(cmd.description)}</p>
+                            <div class="flex flex-wrap gap-1.5 pt-1">
+                                ${tagsHtml}
+                            </div>
+                        </div>
+
+                        <!-- 코드 블록 -->
+                        <div class="relative rounded-2xl bg-slate-900 text-slate-200 p-4 font-mono text-xs overflow-x-auto max-h-52 border border-slate-800">
+                            <pre id="${cardId}" class="whitespace-pre-wrap">${escapeHtml(cmd.code)}</pre>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 원버튼 복사 기능 (iframe 환경 대응 execCommand 활용)
+        function copyCode(elementId) {
+            const codeElem = document.getElementById(elementId);
+            if (!codeElem) return;
+
+            const text = codeElem.innerText;
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast('클립보드에 복사되었습니다!');
+                } else {
+                    showToast('복사에 실패했습니다.', true);
+                }
+            } catch (err) {
+                showToast('클립보드 복사 권한이 없습니다.', true);
+            }
+
+            document.body.removeChild(textarea);
+        }
+
+        // 파일 다운로드 기능
+        function downloadCode(elementId) {
+            const codeElem = document.getElementById(elementId);
+            if (!codeElem) return;
+
+            const cardElement = codeElem.closest('.bg-white');
+            const titleElem = cardElement ? cardElement.querySelector('h3') : null;
+            const titleText = titleElem ? titleElem.innerText.trim() : 'script';
+            
+            const foundCmd = commands.find(c => c.title === titleText);
+            const ext = foundCmd ? foundCmd.extension : 'ps1';
+
+            const blob = new Blob([codeElem.innerText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${titleText.replace(/[\s/\\?%*:|"<>]/g, '_')}.${ext}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('파일이 다운로드되었습니다!');
+        }
+
+        // 토스트 알림 표시
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.innerText = message;
+
+            if (isError) {
+                toast.classList.add('bg-rose-600', 'text-white');
+            } else {
+                toast.classList.remove('bg-rose-600', 'text-white');
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        // 모달 제어
+        function openAddModal() {
+            document.getElementById('addModal').classList.remove('hidden');
+            document.getElementById('addModal').classList.add('flex');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('flex');
+            document.getElementById('addModal').classList.add('hidden');
+            document.getElementById('commandForm').reset();
+        }
+
+        // 새 명령어 등록 처리 (로컬스토리지 저장)
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const title = document.getElementById('newTitle').value.trim();
+            const description = document.getElementById('newDesc').value.trim();
+            const rawTags = document.getElementById('newTags').value.trim();
+            const extension = document.getElementById('newExt').value;
+            const code = document.getElementById('newCode').value;
+
+            const tags = rawTags.split(',').map(t => t.trim()).filter(t => t.length > 0);
+
+            const newCommand = {
+                id: 'cmd-' + Date.now(),
+                title,
+                description,
+                tags,
+                extension,
+                code
+            };
+
+            commands.unshift(newCommand);
+            localStorage.setItem('it_commands', JSON.stringify(commands));
+
+            closeAddModal();
+            renderTags();
+            renderCommands();
+            showToast('새 스크립트가 성공적으로 등록되었습니다!');
+        }
+
+        // HTML 특수문자 이스케이프 유틸
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
 </body>
 </html>
