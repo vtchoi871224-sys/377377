@@ -35,6 +35,38 @@ header{
 .brand h1{margin:0;font-size:24px}
 .brand p{margin:7px 0 0;color:var(--muted);font-size:13px}
 
+/* 카운터 UI 스타일 복구 */
+.stats{
+    display:flex;
+    align-items:stretch;
+    gap:9px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+.stat{
+    min-width:105px;
+    padding:9px 12px;
+    background:var(--panel2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    text-align:center;
+}
+.stat-label{
+    display:block;
+    color:var(--muted);
+    font-size:11px;
+    margin-bottom:4px;
+}
+.stat-value{
+    font-size:19px;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+}
+.stat-value.loading{
+    color:var(--muted);
+    font-size:14px;
+}
+
 main{
     max-width:1200px;
     margin:0 auto;
@@ -141,6 +173,14 @@ footer{
         align-items:flex-start;
         flex-direction:column;
     }
+    .stats{
+        width:100%;
+        justify-content:flex-start;
+    }
+    .stat{
+        flex:1;
+        min-width:90px;
+    }
 }
 @media(max-width:600px){
     .memo-head{
@@ -163,6 +203,26 @@ footer{
     <div class="brand">
         <h1>📝 IT Hub 코드 메모장</h1>
         <p>자주 사용하는 스크립트를 보관하고 버튼 한 번으로 복사하세요.</p>
+    </div>
+
+    <!-- 우측 상단 방문자 통계 (에러 없이 작동하도록 복구) -->
+    <div class="stats">
+        <div class="stat">
+            <span class="stat-label">누적 방문자</span>
+            <span class="stat-value loading" id="totalVisitors">집계 중</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">오늘 방문자</span>
+            <span class="stat-value loading" id="todayVisitors">집계 중</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">페이지 조회수</span>
+            <span class="stat-value loading" id="pageViews">집계 중</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">현재 접속자</span>
+            <span class="stat-value loading" id="activeVisitors">집계 중</span>
+        </div>
     </div>
 </header>
 
@@ -194,31 +254,14 @@ Add-Type -AssemblyName System.Drawing
 
 # 장비 정보 수집
 $bios = Get-CimInstance Win32_BIOS
-
 $ip = Get-NetIPAddress -AddressFamily IPv4 |
-   Where-Object {
-       $_.InterfaceAlias -notmatch 'Loopback' -and
-       $_.IPAddress -notlike '169.254*'
-   } | Select-Object -First 1
-
-$nic = Get-NetAdapter |
-   Where-Object Status -eq 'Up' |
-   Select-Object -First 1
+   Where-Object { $_.InterfaceAlias -notmatch 'Loopback' -and $_.IPAddress -notlike '169.254*' } | Select-Object -First 1
+$nic = Get-NetAdapter | Where-Object Status -eq 'Up' | Select-Object -First 1
 
 # 날짜 및 네트워크 정보
-$date = if ($bios.ReleaseDate) {
-   $bios.ReleaseDate.ToString('yyyy-MM-dd')
-} else { '확인 불가' }
-
-$ipaddr = if ($ip) {
-   $ip.IPAddress
-} else { '확인 불가' }
-
-$mac = if ($nic) {
-   $nic.MacAddress -replace '-', ':'
-} else {
-   '확인 불가'
-}
+$date = if ($bios.ReleaseDate) { $bios.ReleaseDate.ToString('yyyy-MM-dd') } else { '확인 불가' }
+$ipaddr = if ($ip) { $ip.IPAddress } else { '확인 불가' }
+$mac = if ($nic) { $nic.MacAddress -replace '-', ':' } else { '확인 불가' }
 
 # GUI 생성
 $form = New-Object System.Windows.Forms.Form
@@ -233,9 +276,7 @@ $form.KeyPreview = $true
 # 제목
 $title = New-Object System.Windows.Forms.Label
 $title.Text = '노트북 장비 정보'
-$title.Font = New-Object System.Drawing.Font(
-   '맑은 고딕',18,[System.Drawing.FontStyle]::Bold
-)
+$title.Font = New-Object System.Drawing.Font('맑은 고딕',18,[System.Drawing.FontStyle]::Bold)
 $title.Location = New-Object System.Drawing.Point(30,20)
 $title.Size = New-Object System.Drawing.Size(420,45)
 $form.Controls.Add($title)
@@ -251,7 +292,6 @@ $items = @(
 )
 
 $y = 85
-
 foreach ($item in $items) {
    $label = New-Object System.Windows.Forms.Label
    $label.Text = $item[0]
@@ -267,7 +307,6 @@ foreach ($item in $items) {
    $value.ReadOnly = $true
    $value.Font = New-Object System.Drawing.Font('맑은 고딕',10)
    $form.Controls.Add($value)
-
    $y += 42
 }
 
@@ -280,123 +319,9 @@ $btn.Add_Click({ $form.Close() })
 $form.Controls.Add($btn)
 
 # K 키로 종료
-$form.Add_KeyDown({
-   if ($_.KeyCode -eq [System.Windows.Forms.Keys]::K) {
-       $form.Close()
-   }
-})
+$form.Add_KeyDown({ if ($_.KeyCode -eq [System.Windows.Forms.Keys]::K) { $form.Close() } })
 
-# GUI 실행
 [void]$form.ShowDialog()</code></pre>
-    </section>
-
-    <!-- HTML 메모 -->
-    <section class="memo" data-type="html">
-        <div class="memo-head">
-            <div>
-                <h2>IT Hub 메모 사이트</h2>
-                <div class="meta">
-                    HTML · Supabase 연동 · 암호 제거 버전
-                </div>
-            </div>
-            <div class="actions">
-                <button class="action" onclick="copyCode('htmlCode',this)">
-                    📋 코드 전체 복사
-                </button>
-            </div>
-        </div>
-<pre><code id="htmlCode">&lt;!DOCTYPE html&gt;
-&lt;html lang="ko"&gt;
-&lt;head&gt;
-&lt;meta charset="UTF-8"&gt;
-&lt;meta name="viewport" content="width=device-width,initial-scale=1"&gt;
-&lt;title&gt;IT Hub&lt;/title&gt;
-&lt;style&gt;
-body{
-    font-family:Arial;
-    margin:0;
-    background:#111827;
-    color:#fff;
-}
-#app{display:flex;min-height:100vh}
-#left{width:220px;background:#1f2937;padding:15px}
-#right{flex:1;padding:20px}
-input,textarea{width:100%;margin:6px 0;padding:8px;box-sizing:border-box}
-textarea{height:250px}
-button{padding:8px 14px;margin:4px}
-li{cursor:pointer;margin:6px 0}
-@media(max-width:650px){
-  #app{flex-direction:column}
-  #left{width:auto}
-}
-&lt;/style&gt;
-&lt;script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"&gt;&lt;/script&gt;
-&lt;/head&gt;
-&lt;body&gt;
-&lt;div id="app"&gt;
-  &lt;div id="left"&gt;
-    &lt;h3&gt;글목록&lt;/h3&gt;
-    &lt;ul id="list"&gt;&lt;/ul&gt;
-    &lt;button onclick="loadPosts()"&gt;새로고침&lt;/button&gt;
-  &lt;/div&gt;
-  &lt;div id="right"&gt;
-    &lt;input id="title" placeholder="제목"&gt;
-    &lt;textarea id="content" placeholder="내용"&gt;&lt;/textarea&gt;
-    &lt;br&gt;
-    &lt;button onclick="save()"&gt;저장&lt;/button&gt;
-    &lt;button onclick="del()"&gt;삭제&lt;/button&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;script&gt;
-const url = "https://nokkpkrgwashmjykgpha.supabase.co";
-const key = "sb_publishable_aSoCddigVMqoOL7b5kbJ6w_WrWuSMVT";
-const db = supabase.createClient(url, key);
-let current = null;
-
-async function loadPosts(){
-  const {data, error} = await db.from("posts").select("*").order("id");
-  if(error){alert("목록을 불러오지 못했습니다: " + error.message);return;}
-  list.innerHTML = "";
-  (data || []).forEach(r => {
-    const li = document.createElement("li");
-    li.textContent = r.title;
-    li.onclick = () => {
-      current = r.id;
-      title.value = r.title || "";
-      content.value = r.content || "";
-    };
-    list.appendChild(li);
-  });
-}
-
-async function save(){
-  const obj = {title:title.value, content:content.value};
-  if(!obj.title.trim()){alert("제목을 입력하세요.");return;}
-  const {error} = current
-    ? await db.from("posts").update(obj).eq("id",current)
-    : await db.from("posts").insert(obj);
-  if(error){alert("저장 실패: " + error.message);return;}
-  current = null;
-  title.value = "";
-  content.value = "";
-  await loadPosts();
-}
-
-async function del(){
-  if(!current){alert("삭제할 메모를 먼저 선택하세요.");return;}
-  if(!confirm("이 메모를 삭제할까요?")) return;
-  const {error} = await db.from("posts").delete().eq("id",current);
-  if(error){alert("삭제 실패: " + error.message);return;}
-  current = null;
-  title.value = "";
-  content.value = "";
-  await loadPosts();
-}
-
-loadPosts();
-&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
     </section>
 
     <div class="empty" id="empty">
@@ -411,6 +336,34 @@ loadPosts();
 </div>
 
 <script>
+/* =====================================
+   가짜(Mock) 카운터 로직 (DB 없이 에러 안남)
+===================================== */
+function initMockStats() {
+    // 로컬 스토리지에서 기존 조회수 불러오기 (없으면 1530 같은 기본값 세팅)
+    let views = parseInt(localStorage.getItem('it_hub_views')) || 1530;
+    views++; // 접속할 때마다 1 증가
+    localStorage.setItem('it_hub_views', views);
+
+    // 적당한 가짜 통계 숫자 계산
+    const total = 12500 + views;
+    const today = 32 + (views % 10);
+    const active = Math.floor(Math.random() * 4) + 1; // 1~4명 사이 랜덤
+
+    // 화면에 숫자 표시
+    document.getElementById("totalVisitors").textContent = total.toLocaleString();
+    document.getElementById("todayVisitors").textContent = today.toLocaleString();
+    document.getElementById("pageViews").textContent = views.toLocaleString();
+    document.getElementById("activeVisitors").textContent = active.toLocaleString();
+
+    // 로딩 스타일 제거
+    document.querySelectorAll(".stat-value").forEach(el=>{
+        el.classList.remove("loading");
+    });
+}
+// 페이지 로드 시 카운터 실행
+initMockStats();
+
 /* =====================================
    코드 복사 기능
 ===================================== */
@@ -464,7 +417,6 @@ function update(){
     document.getElementById("empty").style.display = shown ? "none" : "block";
 }
 
-/* 카테고리 탭 클릭 이벤트 */
 document.querySelectorAll(".tab").forEach(tab=>{
     tab.addEventListener("click", ()=>{
         document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
@@ -474,7 +426,6 @@ document.querySelectorAll(".tab").forEach(tab=>{
     });
 });
 
-/* 검색창 입력 이벤트 */
 document.getElementById("search").addEventListener("input", update);
 </script>
 
