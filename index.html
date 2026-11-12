@@ -232,7 +232,7 @@ footer{
         <input class="search" id="search" type="search" placeholder="메모 검색...">
     </div>
 
-    <!-- PowerShell 메모 (모델명 추가 및 높이 조절) -->
+    <!-- PowerShell 메모 (베이스보드 모델명 적용) -->
     <section class="memo" data-type="powershell">
         <div class="memo-head">
             <div>
@@ -252,7 +252,7 @@ Add-Type -AssemblyName System.Drawing
 
 # 장비 정보 수집
 $bios = Get-CimInstance Win32_BIOS
-$cs = Get-CimInstance Win32_ComputerSystem
+$board = Get-CimInstance Win32_BaseBoard
 $ip = Get-NetIPAddress -AddressFamily IPv4 |
    Where-Object {
        $_.InterfaceAlias -notmatch 'Loopback' -and
@@ -295,11 +295,11 @@ $title.Location = New-Object System.Drawing.Point(30,20)
 $title.Size = New-Object System.Drawing.Size(420,45)
 $form.Controls.Add($title)
 
-# 표시 항목 (모델명 추가)
+# 표시 항목 (베이스보드 Product로 변경)
 $items = @(
    @('유저네임',$env:USERNAME),
    @('호스트 네임',$env:COMPUTERNAME),
-   @('모델명',$cs.Model),
+   @('모델명',$board.Product),
    @('BIOS 날짜',$date),
    @('제조번호',$bios.SerialNumber),
    @('IP 주소',$ipaddr),
@@ -345,8 +345,6 @@ $form.Add_KeyDown({
 # GUI 실행
 [void]$form.ShowDialog()</code></pre>
     </section>
-
-    <!-- 안 쓰던 HTML 메모장 구역 완전 삭제 완료 -->
 
     <div class="empty" id="empty">
         검색 결과가 없습니다.
