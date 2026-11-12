@@ -468,7 +468,7 @@ $mac = if ($nic) {
 
 # 3. GUI 창 생성
 $form = New-Object System.Windows.Forms.Form
-$form.Text = '장비 정보'
+$form.Text = ''
 $form.Size = New-Object System.Drawing.Size(500, 490)
 $form.StartPosition = 'CenterScreen'
 $form.BackColor = [System.Drawing.Color]::White
@@ -478,7 +478,7 @@ $form.KeyPreview = $true
 
 # 4. 제목 라벨
 $title = New-Object System.Windows.Forms.Label
-$title.Text = '장비 정보'
+$title.Text = ''
 $title.Font = New-Object System.Drawing.Font('맑은 고딕', 18, [System.Drawing.FontStyle]::Bold)
 $title.Location = New-Object System.Drawing.Point(30, 20)
 $title.Size = New-Object System.Drawing.Size(420, 45)
