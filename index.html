@@ -252,7 +252,7 @@ footer {
 
 <header>
     <h1>🛠️ IT 명령어 메모</h1>
-    <p>Windows · 네트워크 · 하드웨어 · Linux 명령어 관리</p>
+    <p>Windows · PowerShell · 네트워크 · 하드웨어 · Linux 명령어 관리</p>
 </header>
 
 <main>
@@ -296,6 +296,7 @@ footer {
 
         <select id="newCat">
             <option>Windows</option>
+            <option>PowerShell</option>
             <option>네트워크</option>
             <option>하드웨어</option>
             <option>Linux</option>
@@ -483,6 +484,117 @@ desc:'DESKTOP- 뒤에 7자리 랜덤 이름 생성 및 변경',
 code:"$name = 'DESKTOP-' + (-join ((65..90) + (48..57) | Get-Random -Count 7 | ForEach-Object { [char]$_ }))\nRename-Computer -NewName $name"
 },
 
+// ==================================
+// 노트북 장비 정보 GUI
+// ==================================
+
+{
+id:'laptopinfo',
+title:'노트북 장비 정보 GUI',
+cat:'PowerShell',
+desc:'사용자, PC 이름, 모델명, BIOS 날짜, 시리얼, IP, MAC 주소 표시',
+code:String.raw`
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+# 1. 장비 정보 수집
+$bios = Get-CimInstance Win32_BIOS
+$cs = Get-CimInstance Win32_ComputerSystem
+$board = Get-CimInstance Win32_BaseBoard
+
+$ip = Get-NetIPAddress -AddressFamily IPv4 |
+    Where-Object {
+        $_.InterfaceAlias -notmatch 'Loopback' -and
+        $_.IPAddress -notlike '169.254*'
+    } | Select-Object -First 1
+
+$nic = Get-NetAdapter |
+    Where-Object Status -eq 'Up' |
+    Select-Object -First 1
+
+# 2. 날짜 및 네트워크 정보 가공
+$date = if ($bios.ReleaseDate) {
+    $bios.ReleaseDate.ToString('yyyy-MM-dd')
+} else { '확인 불가' }
+
+$ipaddr = if ($ip) { $ip.IPAddress } else { '확인 불가' }
+
+$mac = if ($nic) {
+    $nic.MacAddress -replace '-', ':'
+} else {
+    '확인 불가'
+}
+
+# 3. GUI 창 생성
+$form = New-Object System.Windows.Forms.Form
+$form.Text = '노트북 장비 정보'
+$form.Size = New-Object System.Drawing.Size(500, 490)
+$form.StartPosition = 'CenterScreen'
+$form.BackColor = [System.Drawing.Color]::White
+$form.FormBorderStyle = 'FixedDialog'
+$form.MaximizeBox = $false
+$form.KeyPreview = $true
+
+# 4. 제목 라벨
+$title = New-Object System.Windows.Forms.Label
+$title.Text = '노트북 장비 정보'
+$title.Font = New-Object System.Drawing.Font('맑은 고딕', 18, [System.Drawing.FontStyle]::Bold)
+$title.Location = New-Object System.Drawing.Point(30, 20)
+$title.Size = New-Object System.Drawing.Size(420, 45)
+$form.Controls.Add($title)
+
+# 5. 표시 항목 정의
+$items = @(
+    @('유저네임', $env:USERNAME),
+    @('호스트 네임', $env:COMPUTERNAME),
+    @('모델명', $board.Product),
+    @('BIOS 날짜', $date),
+    @('제조번호', $bios.SerialNumber),
+    @('IP 주소', $ipaddr),
+    @('MAC 주소', $mac)
+)
+
+$y = 85
+
+foreach ($item in $items) {
+    $label = New-Object System.Windows.Forms.Label
+    $label.Text = $item[0]
+    $label.Location = New-Object System.Drawing.Point(30, $y)
+    $label.Size = New-Object System.Drawing.Size(140, 30)
+    $label.Font = New-Object System.Drawing.Font('맑은 고딕', 10)
+    $form.Controls.Add($label)
+
+    $value = New-Object System.Windows.Forms.TextBox
+    $value.Text = [string]$item[1]
+    $value.Location = New-Object System.Drawing.Point(175, $y)
+    $value.Size = New-Object System.Drawing.Size(275, 30)
+    $value.ReadOnly = $true
+    $value.Font = New-Object System.Drawing.Font('맑은 고딕', 10)
+    $form.Controls.Add($value)
+
+    $y += 42
+}
+
+# 6. 닫기 버튼 생성
+$btn = New-Object System.Windows.Forms.Button
+$btn.Text = '닫기 (K)'
+$btn.Location = New-Object System.Drawing.Point(350, 390)
+$btn.Size = New-Object System.Drawing.Size(100, 35)
+$btn.Add_Click({ $form.Close() })
+$form.Controls.Add($btn)
+
+# 7. 키보드 이벤트 (K 키로 종료)
+$form.Add_KeyDown({
+    if ($_.KeyCode -eq [System.Windows.Forms.Keys]::K) {
+        $form.Close()
+    }
+})
+
+# 8. GUI 실행
+[void]$form.ShowDialog()
+`
+},
+
 {
 id:'linuxip',
 title:'Linux IP 주소 확인',
@@ -539,11 +651,18 @@ code:'bcdedit /enum all'
 
 const KEY = 'itCommandMemos_v1';
 
-let saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+let saved = [];
+
+try {
+    saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+    if (!Array.isArray(saved)) saved = [];
+} catch {
+    saved = [];
+}
 
 let memos = [
     ...defaults.map(x => ({...x, builtin:true})),
-    ...saved
+    ...saved.map(x => ({...x, builtin:false}))
 ];
 
 let active = '전체';
@@ -603,7 +722,7 @@ function render() {
     $('sortCat').innerHTML =
         '<option value="전체">전체 카테고리</option>' +
         cats.filter(c => c !== '전체')
-            .map(c => `<option>${esc(c)}</option>`)
+            .map(c => `<option value="${esc(c)}">${esc(c)}</option>`)
             .join('');
 
     $('sortCat').value = active;
@@ -697,6 +816,8 @@ $('cards').addEventListener('click', async e => {
             x => x.id === copy.dataset.copy
         );
 
+        if (!item) return;
+
         try {
 
             await navigator.clipboard.writeText(item.code);
@@ -713,10 +834,11 @@ $('cards').addEventListener('click', async e => {
 
         }
 
+        const original = '📋 원클릭 복사';
         copy.textContent = '✓ 복사 완료';
 
         setTimeout(() => {
-            copy.textContent = '📋 원클릭 복사';
+            copy.textContent = original;
         }, 1400);
 
     }
@@ -775,7 +897,8 @@ $('saveMemo').onclick = () => {
         title: title,
         cat: $('newCat').value,
         desc: $('newDesc').value.trim(),
-        code: code
+        code: code,
+        builtin: false
 
     });
 
