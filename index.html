@@ -246,102 +246,200 @@ footer{
             </div>
         </div>
 <pre><code id="psCode">Add-Type -AssemblyName System.Windows.Forms
+
 Add-Type -AssemblyName System.Drawing
 
+
+
 # 장비 정보 수집 (msinfo32 베이스보드 정보로 변경)
+
 $bios = Get-CimInstance Win32_BIOS
+
 $board = Get-CimInstance Win32_BaseBoard
+
 $ip = Get-NetIPAddress -AddressFamily IPv4 |
+
    Where-Object {
+
        $_.InterfaceAlias -notmatch 'Loopback' -and
+
        $_.IPAddress -notlike '169.254*'
+
    } | Select-Object -First 1
 
+
+
 $nic = Get-NetAdapter |
+
    Where-Object Status -eq 'Up' |
+
    Select-Object -First 1
 
+
+
 # 날짜 및 네트워크 정보
+
 $date = if ($bios.ReleaseDate) {
+
    $bios.ReleaseDate.ToString('yyyy-MM-dd')
+
 } else { '확인 불가' }
 
+
+
 $ipaddr = if ($ip) { $ip.IPAddress } else { '확인 불가' }
+
 $mac = if ($nic) {
+
    $nic.MacAddress -replace '-', ':'
+
 } else {
+
    '확인 불가'
+
 }
 
+
+
 # GUI 생성
+
 $form = New-Object System.Windows.Forms.Form
+
 $form.Text = '노트북 장비 정보'
+
 $form.Size = New-Object System.Drawing.Size(500,490)
+
 $form.StartPosition = 'CenterScreen'
+
 $form.BackColor = [System.Drawing.Color]::White
+
 $form.FormBorderstyle="FixedDialog"
+
 $form.MaximizeBox = $false
+
 $form.KeyPreview = $true
 
+
+
 # 제목
+
 $title = New-Object System.Windows.Forms.Label
+
 $title.Text = '노트북 장비 정보'
+
 $title.Font = New-Object System.Drawing.Font(
+
    '맑은 고딕',18,[System.Drawing.FontStyle]::Bold
+
 )
+
 $title.Location = New-Object System.Drawing.Point(30,20)
+
 $title.Size = New-Object System.Drawing.Size(420,45)
+
 $form.Controls.Add($title)
 
+
+
 # 표시 항목 (모델명 자리에 베이스보드 Product 매핑)
+
 $items = @(
+
    @('유저네임',$env:USERNAME),
+
    @('호스트 네임',$env:COMPUTERNAME),
+
    @('모델명',$board.Product),
+
    @('BIOS 날짜',$date),
+
    @('제조번호',$bios.SerialNumber),
+
    @('IP 주소',$ipaddr),
+
    @('MAC 주소',$mac)
+
 )
+
+
 
 $y = 85
 
+
+
 foreach ($item in $items) {
+
    $label = New-Object System.Windows.Forms.Label
+
    $label.Text = $item[0]
+
    $label.Location = New-Object System.Drawing.Point(30,$y)
+
    $label.Size = New-Object System.Drawing.Size(140,30)
+
    $label.Font = New-Object System.Drawing.Font('맑은 고딕',10)
+
    $form.Controls.Add($label)
 
+
+
    $value = New-Object System.Windows.Forms.TextBox
+
    $value.Text = [string]$item[1]
+
    $value.Location = New-Object System.Drawing.Point(175,$y)
+
    $value.Size = New-Object System.Drawing.Size(275,30)
+
    $value.ReadOnly = $true
+
    $value.Font = New-Object System.Drawing.Font('맑은 고딕',10)
+
    $form.Controls.Add($value)
 
+
+
    $y += 42
+
 }
 
+
+
 # 닫기 버튼
+
 $btn = New-Object System.Windows.Forms.Button
+
 $btn.Text = '닫기 (K)'
+
 $btn.Location = New-Object System.Drawing.Point(350,390)
+
 $btn.Size = New-Object System.Drawing.Size(100,35)
+
 $btn.Add_Click({ $form.Close() })
+
 $form.Controls.Add($btn)
 
+
+
 # K 키로 종료
+
 $form.Add_KeyDown({
+
    if ($_.KeyCode -eq [System.Windows.Forms.Keys]::K) {
+
        $form.Close()
+
    }
+
 })
 
+
+
 # GUI 실행
-[void]$form.ShowDialog()</code></pre>
+
+[void]$form.ShowDialog()
+
+</code></pre>
     </section>
 
     <div class="empty" id="empty">
