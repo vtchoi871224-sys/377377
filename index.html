@@ -1,530 +1,805 @@
+
 <!DOCTYPE html>
-<html lang="ko" class="light">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT 명령어 아카이브</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'Malgun Gothic', 'sans-serif'],
-                        mono: ['Consolas', 'Courier New', monospace]
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- FontAwesome 아이콘 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* 커스텀 스크롤바 */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        .dark ::-webkit-scrollbar-thumb {
-            background: #475569;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT 명령어 메모</title>
+
+<style>
+:root {
+    --bg: #f4f6fb;
+    --white: #fff;
+    --blue: #315efb;
+    --text: #172033;
+    --muted: #667085;
+    --line: #e5e9f2;
+    --code: #101828;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Malgun Gothic", sans-serif;
+}
+
+header {
+    background: linear-gradient(120deg,#14213d,#315efb);
+    color: white;
+    padding: 30px 25px;
+}
+
+header h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+header p { color: #dbe5ff; }
+
+main {
+    max-width: 1180px;
+    margin: 24px auto;
+    padding: 0 18px;
+}
+
+.toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+input, select, textarea {
+    font: inherit;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 11px 13px;
+    background: white;
+}
+
+#search {
+    flex: 1;
+    min-width: 220px;
+}
+
+button {
+    border: 0;
+    border-radius: 9px;
+    padding: 10px 14px;
+    font-weight: bold;
+    cursor: pointer;
+    background: var(--blue);
+    color: white;
+}
+
+button.secondary {
+    background: #eaf0ff;
+    color: #2448c7;
+}
+
+button.ghost {
+    background: #eef0f5;
+    color: #344054;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 18px;
+    align-items: start;
+}
+
+aside, .card, .editor {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+}
+
+aside {
+    padding: 14px;
+    position: sticky;
+    top: 15px;
+}
+
+aside h3 {
+    margin: 4px 8px 12px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.cat {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    color: #344054;
+    margin: 3px 0;
+}
+
+.cat.active {
+    background: #eaf0ff;
+    color: #2448c7;
+}
+
+#count {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(290px, 1fr)
+    );
+    gap: 14px;
+}
+
+.card {
+    padding: 16px;
+    min-width: 0;
+}
+
+.cardtop {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.card h3 {
+    font-size: 16px;
+    margin: 0 0 7px;
+}
+
+.tag {
+    font-size: 11px;
+    color: #3152b8;
+    background: #edf2ff;
+    border-radius: 20px;
+    padding: 5px 8px;
+    white-space: nowrap;
+}
+
+.desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+}
+
+pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    background: var(--code);
+    color: #e6edf7;
+    border-radius: 10px;
+    padding: 13px;
+    font: 12px/1.55 Consolas, monospace;
+    max-height: 230px;
+    overflow: auto;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.actions button {
+    font-size: 12px;
+    padding: 8px 11px;
+}
+
+.empty {
+    background: white;
+    border: 1px dashed #cbd3e1;
+    border-radius: 14px;
+    padding: 30px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.editor {
+    margin-top: 20px;
+    padding: 17px;
+}
+
+.editor h2 {
+    font-size: 18px;
+}
+
+.fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.fields textarea {
+    grid-column: 1 / -1;
+    min-height: 130px;
+    font-family: Consolas, monospace;
+}
+
+.editor input,
+.editor select,
+.editor textarea {
+    width: 100%;
+}
+
+.editor .actions {
+    margin-top: 10px;
+}
+
+footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 25px;
+}
+
+@media(max-width:720px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { position: static; }
+    .fields { grid-template-columns: 1fr; }
+    .fields textarea { grid-column: auto; }
+}
+</style>
 </head>
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-300 font-sans">
 
-    <!-- 상단 네비게이션바 -->
-    <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="resetFilter()">
-                <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-lg shadow-indigo-500/30">
-                    <i class="fa-solid fa-terminal text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight tracking-tight">IT Command Vault</h1>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">시스템 관리 및 스크립트 아카이브</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center space-x-3">
-                <button onclick="openAddModal()" class="inline-flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-sm transition-all transform active:scale-95">
-                    <i class="fa-solid fa-plus"></i>
-                    <span class="hidden sm:inline">스크립트 등록</span>
-                </button>
-                <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" title="테마 변경">
-                    <i id="themeIcon" class="fa-solid fa-moon"></i>
-                </button>
-            </div>
-        </div>
-    </header>
+<body>
 
-    <!-- 메인 컨테이너 -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+<header>
+    <h1>🛠️ IT 명령어 메모</h1>
+    <p>Windows · 네트워크 · 하드웨어 · Linux 명령어 관리</p>
+</header>
 
-        <!-- 검색 및 필터 영역 -->
-        <div class="space-y-4">
-            <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
-                    <i class="fa-solid fa-search"></i>
-                </span>
-                <input type="text" id="searchInput" oninput="filterCommands()" placeholder="명령어 제목, 설명 또는 코드 내용으로 검색..." class="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
-            </div>
+<main>
 
-            <!-- 태그 필터 버튼 그룹 -->
-            <div id="tagFilterContainer" class="flex flex-wrap gap-2 items-center">
-                <!-- 동적으로 생성됨 -->
-            </div>
-        </div>
+<div class="toolbar">
+    <input
+        id="search"
+        placeholder="명령어 또는 설명 검색..."
+    >
 
-        <!-- 명령어 카드 그리드 -->
-        <div id="commandGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- 동적으로 주입됨 -->
-        </div>
+    <select id="sortCat">
+        <option value="전체">전체 카테고리</option>
+    </select>
 
-        <!-- 검색 결과 없음 안내 -->
-        <div id="noResults" class="hidden text-center py-16 space-y-3">
-            <div class="text-4xl text-slate-300 dark:text-slate-600">
-                <i class="fa-solid fa-folder-open"></i>
-            </div>
-            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">검색 결과가 없습니다. 다른 검색어를 입력해보세요.</p>
-        </div>
-    </main>
+    <button class="secondary" id="showAdd">
+        ＋ 메모 추가
+    </button>
+</div>
 
-    <!-- 푸터 -->
-    <footer class="border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-500 dark:text-slate-400">
-        <p>&copy; 2026 IT Command Vault. All rights reserved.</p>
-    </footer>
+<div class="layout">
 
-    <!-- 스크립트 추가 모달 -->
-    <div id="addModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-700 space-y-6 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between">
-                <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">새 스크립트/명령어 등록</h3>
-                <button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
+<aside>
+    <h3>카테고리</h3>
+    <div id="categories"></div>
+</aside>
 
-            <form id="commandForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">제목</label>
-                    <input type="text" id="newTitle" required placeholder="예: 네트워크 어댑터 재시작" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
+<section>
+    <p id="count"></p>
+    <div class="cards" id="cards"></div>
+</section>
 
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">설명</label>
-                    <textarea id="newDesc" rows="2" required placeholder="이 스크립트나 명령어가 하는 일을 간략히 설명해주세요." class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-                </div>
+</div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">카테고리 / 태그 (콤마로 구분)</label>
-                        <input type="text" id="newTags" required placeholder="PowerShell, Windows, 네트워크" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">다운로드 확장자 (선택)</label>
-                        <select id="newExt" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="ps1">ps1 (PowerShell)</option>
-                            <option value="bat">bat (Batch)</option>
-                            <option value="sh">sh (Shell Script)</option>
-                            <option value="txt">txt (텍스트)</option>
-                        </select>
-                    </div>
-                </div>
+<section class="editor" id="editor" hidden>
 
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">코드 / 명령어 내용</label>
-                    <textarea id="newCode" rows="8" required placeholder="실행할 명령어 코드를 입력하세요..." class="w-full px-4 py-2.5 font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-                </div>
+    <h2>새 명령어 메모</h2>
 
-                <div class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="closeAddModal()" class="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">취소</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium shadow-sm transition-all">등록하기</button>
-                </div>
-            </form>
-        </div>
+    <div class="fields">
+
+        <input id="newTitle" placeholder="제목">
+
+        <select id="newCat">
+            <option>Windows</option>
+            <option>네트워크</option>
+            <option>하드웨어</option>
+            <option>Linux</option>
+            <option>부팅·복구</option>
+            <option>기타</option>
+        </select>
+
+        <input id="newDesc" placeholder="설명">
+
+        <textarea id="newCode"
+            placeholder="명령어 입력"></textarea>
+
     </div>
 
-    <!-- 알림 토스트 메시지 -->
-    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-5 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm font-medium">
-        <i class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600"></i>
-        <span id="toastMessage">클립보드에 복사되었습니다!</span>
+    <div class="actions">
+        <button id="saveMemo">저장</button>
+        <button class="ghost" id="cancelMemo">취소</button>
     </div>
 
-    <!-- JavaScript 로직 -->
-    <script>
-        // 초기 데이터 (사용자가 요청한 첫 번째 노트북 장비 정보 스크립트 포함)
-        const defaultCommands = [
-            {
-                id: 'notebook-info-ps1',
-                title: '노트북 장비 정보 GUI 출력 스크립트',
-                description: 'Windows 시스템의 BIOS, 컴퓨터 시스템, 메인보드 정보 및 IP, MAC 주소를 수집하여 깔끔한 GUI 창으로 띄워주는 PowerShell 스크립트입니다. (K 키로 종료 가능)',
-                tags: ['PowerShell', 'Windows', 'GUI', '장비정보'],
-                extension: 'ps1',
-                code: `Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
+</section>
 
-# 1. 장비 정보 수집
-$bios = Get-CimInstance Win32_BIOS
-$cs = Get-CimInstance Win32_ComputerSystem
-$board = Get-CimInstance Win32_BaseBoard
+</main>
 
-$ip = Get-NetIPAddress -AddressFamily IPv4 |
-    Where-Object {
-        $_.InterfaceAlias -notmatch 'Loopback' -and
-        $_.IPAddress -notlike '169.254*'
-    } | Select-Object -First 1
+<footer>
+    메모는 현재 브라우저에 자동 저장됩니다.
+</footer>
 
-$nic = Get-NetAdapter |
-    Where-Object Status -eq 'Up' |
-    Select-Object -First 1
+<script>
 
-# 2. 날짜 및 네트워크 정보 가공
-$date = if ($bios.ReleaseDate) {
-    $bios.ReleaseDate.ToString('yyyy-MM-dd')
-} else { '확인 불가' }
+// ==================================
+// 1. 기본 명령어 데이터
+// ==================================
 
-$ipaddr = if ($ip) { $ip.IPAddress } else { '확인 불가' }
-$mac = if ($nic) {
-    $nic.MacAddress -replace '-', ':'
-} else {
-    '확인 불가'
+const defaults = [
+
+{
+id:'ipconfig',
+title:'IP 설정 전체 확인',
+cat:'네트워크',
+desc:'IP, 게이트웨이, DNS 정보 확인',
+code:'ipconfig /all'
+},
+
+{
+id:'flushdns',
+title:'DNS 캐시 초기화',
+cat:'네트워크',
+desc:'DNS 캐시 초기화',
+code:'ipconfig /flushdns'
+},
+
+{
+id:'ping',
+title:'연결 상태 확인',
+cat:'네트워크',
+desc:'대상 IP 연결 테스트',
+code:'ping 8.8.8.8'
+},
+
+{
+id:'port',
+title:'TCP 포트 연결 테스트',
+cat:'네트워크',
+desc:'특정 포트 연결 여부 확인',
+code:'Test-NetConnection 192.168.0.10 -Port 8001'
+},
+
+{
+id:'netstat',
+title:'열린 포트 확인',
+cat:'네트워크',
+desc:'네트워크 연결 및 PID 확인',
+code:'netstat -ano'
+},
+
+{
+id:'adapter',
+title:'네트워크 어댑터 상태',
+cat:'네트워크',
+desc:'네트워크 카드 상태 및 속도',
+code:'Get-NetAdapter | Format-Table Name, Status, LinkSpeed'
+},
+
+{
+id:'ips',
+title:'IPv4 주소 확인',
+cat:'네트워크',
+desc:'IPv4 주소 확인',
+code:"Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceAlias -notmatch 'Loopback' -and $_.IPAddress -notlike '169.254*' } | Format-Table InterfaceAlias, IPAddress"
+},
+
+{
+id:'bios',
+title:'BIOS 및 시리얼 확인',
+cat:'하드웨어',
+desc:'BIOS 버전, 날짜, 제조번호',
+code:'Get-CimInstance Win32_BIOS | Format-List Manufacturer, SMBIOSBIOSVersion, ReleaseDate, SerialNumber'
+},
+
+{
+id:'model',
+title:'PC 모델 및 제조사',
+cat:'하드웨어',
+desc:'컴퓨터 모델명 확인',
+code:'Get-CimInstance Win32_ComputerSystem | Format-List Manufacturer, Model'
+},
+
+{
+id:'board',
+title:'메인보드 정보',
+cat:'하드웨어',
+desc:'메인보드 제품 및 제조사',
+code:'Get-CimInstance Win32_BaseBoard | Format-List Manufacturer, Product, SerialNumber'
+},
+
+{
+id:'ram',
+title:'메모리 정보',
+cat:'하드웨어',
+desc:'RAM 용량, 속도, 제조사',
+code:'Get-CimInstance Win32_PhysicalMemory | Select-Object DeviceLocator, Capacity, Speed, ConfiguredClockSpeed, Manufacturer, PartNumber'
+},
+
+{
+id:'disk',
+title:'디스크 정보',
+cat:'하드웨어',
+desc:'디스크 모델 및 파티션 형식',
+code:'Get-Disk | Format-Table Number, FriendlyName, SerialNumber, PartitionStyle, HealthStatus, Size -Auto'
+},
+
+{
+id:'sysinfo',
+title:'시스템 정보 실행',
+cat:'Windows',
+desc:'Windows 시스템 정보 창 실행',
+code:'msinfo32'
+},
+
+{
+id:'winver',
+title:'Windows 버전 확인',
+cat:'Windows',
+desc:'Windows 버전 및 빌드 확인',
+code:'winver'
+},
+
+{
+id:'sfc',
+title:'시스템 파일 검사',
+cat:'Windows',
+desc:'손상된 Windows 파일 검사 및 복구',
+code:'sfc /scannow'
+},
+
+{
+id:'dism',
+title:'Windows 이미지 복구',
+cat:'Windows',
+desc:'Windows 구성 요소 저장소 복구',
+code:'DISM /Online /Cleanup-Image /RestoreHealth'
+},
+
+{
+id:'services',
+title:'Windows 업데이트 서비스 확인',
+cat:'Windows',
+desc:'업데이트 관련 서비스 상태',
+code:"Get-Service wuauserv, bits, cryptsvc, UsoSvc | Format-Table Name, Status, StartType -Auto"
+},
+
+{
+id:'firewall',
+title:'방화벽 상태 확인',
+cat:'Windows',
+desc:'방화벽 프로필 상태',
+code:'Get-NetFirewallProfile | Format-Table Name, Enabled'
+},
+
+{
+id:'hostname',
+title:'랜덤 PC 이름 생성',
+cat:'Windows',
+desc:'DESKTOP- 뒤에 7자리 랜덤 이름 생성 및 변경',
+code:"$name = 'DESKTOP-' + (-join ((65..90) + (48..57) | Get-Random -Count 7 | ForEach-Object { [char]$_ }))\nRename-Computer -NewName $name"
+},
+
+{
+id:'linuxip',
+title:'Linux IP 주소 확인',
+cat:'Linux',
+desc:'네트워크 인터페이스 IP 확인',
+code:'ip -br addr'
+},
+
+{
+id:'route',
+title:'Linux 라우팅 확인',
+cat:'Linux',
+desc:'기본 게이트웨이 및 라우팅 확인',
+code:'ip route'
+},
+
+{
+id:'lsusb',
+title:'USB 장치 확인',
+cat:'Linux',
+desc:'연결된 USB 장치 목록',
+code:'lsusb'
+},
+
+{
+id:'lspci',
+title:'PCI 장치 확인',
+cat:'Linux',
+desc:'PCI 장치 및 드라이버 확인',
+code:'lspci -nnk'
+},
+
+{
+id:'boot',
+title:'MBR / GPT 확인',
+cat:'부팅·복구',
+desc:'디스크 파티션 형식 확인',
+code:'Get-Disk | Format-Table Number, PartitionStyle, IsBoot, IsSystem'
+},
+
+{
+id:'bcd',
+title:'부팅 구성 확인',
+cat:'부팅·복구',
+desc:'BCD 부팅 항목 확인',
+code:'bcdedit /enum all'
 }
 
-# 3. GUI 창 생성
-$form = New-Object System.Windows.Forms.Form
-$form.Text = '노트북 장비 정보'
-$form.Size = New-Object System.Drawing.Size(500, 490)
-$form.StartPosition = 'CenterScreen'
-$form.BackColor = [System.Drawing.Color]::White
-$form.FormBorderStyle = 'FixedDialog'
-$form.MaximizeBox = $false
-$form.KeyPreview = $true
+];
 
-# 4. 제목 라벨
-$title = New-Object System.Windows.Forms.Label
-$title.Text = '노트북 장비 정보'
-$title.Font = New-Object System.Drawing.Font('맑은 고딕', 18, [System.Drawing.FontStyle]::Bold)
-$title.Location = New-Object System.Drawing.Point(30, 20)
-$title.Size = New-Object System.Drawing.Size(420, 45)
-$form.Controls.Add($title)
+// ==================================
+// 2. 저장 데이터 불러오기
+// ==================================
 
-# 5. 표시 항목 정의 (베이스보드 Product 정보 반영)
-$items = @(
-    @('유저네임', $env:USERNAME),
-    @('호스트 네임', $env:COMPUTERNAME),
-    @('모델명', $board.Product),
-    @('BIOS 날짜', $date),
-    @('제조번호', $bios.SerialNumber),
-    @('IP 주소', $ipaddr),
-    @('MAC 주소', $mac)
-)
+const KEY = 'itCommandMemos_v1';
 
-$y = 85
+let saved = JSON.parse(localStorage.getItem(KEY) || '[]');
 
-foreach ($item in $items) {
-    $label = New-Object System.Windows.Forms.Label
-    $label.Text = $item[0]
-    $label.Location = New-Object System.Drawing.Point(30, $y)
-    $label.Size = New-Object System.Drawing.Size(140, 30)
-    $label.Font = New-Object System.Drawing.Font('맑은 고딕', 10)
-    $form.Controls.Add($label)
+let memos = [
+    ...defaults.map(x => ({...x, builtin:true})),
+    ...saved
+];
 
-    $value = New-Object System.Windows.Forms.TextBox
-    $value.Text = [string]$item[1]
-    $value.Location = New-Object System.Drawing.Point(175, $y)
-    $value.Size = New-Object System.Drawing.Size(275, 30)
-    $value.ReadOnly = $true
-    $value.Font = New-Object System.Drawing.Font('맑은 고딕', 10)
-    $form.Controls.Add($value)
+let active = '전체';
 
-    $y += 42
+const $ = id => document.getElementById(id);
+
+// ==================================
+// 3. 데이터 저장
+// ==================================
+
+function save() {
+
+    localStorage.setItem(
+        KEY,
+        JSON.stringify(memos.filter(x => !x.builtin))
+    );
+
 }
 
-# 6. 닫기 버튼 생성
-$btn = New-Object System.Windows.Forms.Button
-$btn.Text = '닫기 (K)'
-$btn.Location = New-Object System.Drawing.Point(350, 390)
-$btn.Size = New-Object System.Drawing.Size(100, 35)
-$btn.Add_Click({ $form.Close() })
-$form.Controls.Add($btn)
+// ==================================
+// 4. HTML 특수문자 처리
+// ==================================
 
-# 7. 키보드 이벤트 (K 키로 종료)
-$form.Add_KeyDown({
-    if ($_.KeyCode -eq [System.Windows.Forms.Keys]::K) {
-        $form.Close()
+function esc(s) {
+
+    return String(s ?? '').replace(
+        /[&<>"']/g,
+        c => ({
+            '&':'&amp;',
+            '<':'&lt;',
+            '>':'&gt;',
+            '"':'&quot;',
+            "'":'&#39;'
+        }[c])
+    );
+
+}
+
+// ==================================
+// 5. 화면 렌더링
+// ==================================
+
+function render() {
+
+    const cats = [
+        '전체',
+        ...new Set(memos.map(x => x.cat))
+    ];
+
+    $('categories').innerHTML = cats.map(c => `
+        <button class="cat ${active === c ? 'active' : ''}"
+            data-cat="${esc(c)}">
+            ${esc(c)}
+        </button>
+    `).join('');
+
+    $('sortCat').innerHTML =
+        '<option value="전체">전체 카테고리</option>' +
+        cats.filter(c => c !== '전체')
+            .map(c => `<option>${esc(c)}</option>`)
+            .join('');
+
+    $('sortCat').value = active;
+
+    const q = $('search').value.trim().toLowerCase();
+
+    const list = memos.filter(x =>
+        (active === '전체' || x.cat === active) &&
+        [x.title, x.desc, x.code, x.cat]
+            .join(' ')
+            .toLowerCase()
+            .includes(q)
+    );
+
+    $('count').textContent =
+        `총 ${list.length}개 명령어`;
+
+    $('cards').innerHTML = list.length
+        ? list.map(x => `
+            <article class="card">
+
+                <div class="cardtop">
+                    <h3>${esc(x.title)}</h3>
+                    <span class="tag">${esc(x.cat)}</span>
+                </div>
+
+                <p class="desc">${esc(x.desc)}</p>
+
+                <pre>${esc(x.code)}</pre>
+
+                <div class="actions">
+
+                    <button data-copy="${esc(x.id)}">
+                        📋 원클릭 복사
+                    </button>
+
+                    ${x.builtin ? '' : `
+                        <button class="ghost"
+                            data-delete="${esc(x.id)}">
+                            삭제
+                        </button>
+                    `}
+
+                </div>
+
+            </article>
+        `).join('')
+        : '<div class="empty">검색 결과가 없습니다.</div>';
+
+}
+
+// ==================================
+// 6. 카테고리 클릭
+// ==================================
+
+$('categories').addEventListener('click', e => {
+
+    const b = e.target.closest('[data-cat]');
+
+    if (b) {
+        active = b.dataset.cat;
+        render();
     }
-})
 
-# 8. GUI 실행
-[void]$form.ShowDialog()`
-            },
-            {
-                id: 'net-flush-dns',
-                title: 'DNS 캐시 초기화 및 IP 갱신',
-                description: '네트워크 연결 오류나 DNS 문제 발생 시 사용하는 표준 Windows 네트워크 새로고침 명령어 모음입니다.',
-                tags: ['Windows', '네트워크', 'Cmd'],
-                extension: 'bat',
-                code: `ipconfig /flushdns
-ipconfig /release
-ipconfig /renew
-arp -d *
-nbtstat -R`
-            }
-        ];
+});
 
-        let commands = JSON.parse(localStorage.getItem('it_commands')) || defaultCommands;
-        let currentSelectedTag = '전체';
+$('sortCat').addEventListener('change', e => {
 
-        // 앱 초기화
-        window.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            renderTags();
-            renderCommands();
-        });
+    active = e.target.value;
+    render();
 
-        // 다크모드 초기화 및 토글
-        function initTheme() {
-            const isDark = localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            if (isDark) {
-                document.documentElement.classList.add('dark');
-                document.getElementById('themeIcon').className = 'fa-solid fa-sun';
-            } else {
-                document.documentElement.classList.remove('dark');
-                document.getElementById('themeIcon').className = 'fa-solid fa-moon';
-            }
+});
+
+// ==================================
+// 7. 검색
+// ==================================
+
+$('search').addEventListener('input', render);
+
+// ==================================
+// 8. 원클릭 복사 및 삭제
+// ==================================
+
+$('cards').addEventListener('click', async e => {
+
+    const copy = e.target.closest('[data-copy]');
+
+    if (copy) {
+
+        const item = memos.find(
+            x => x.id === copy.dataset.copy
+        );
+
+        try {
+
+            await navigator.clipboard.writeText(item.code);
+
+        } catch {
+
+            const t = document.createElement('textarea');
+            t.value = item.code;
+
+            document.body.appendChild(t);
+            t.select();
+            document.execCommand('copy');
+            t.remove();
+
         }
 
-        function toggleDarkMode() {
-            const html = document.documentElement;
-            const icon = document.getElementById('themeIcon');
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-                icon.className = 'fa-solid fa-moon';
-            } else {
-                html.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-                icon.className = 'fa-solid fa-sun';
-            }
-        }
+        copy.textContent = '✓ 복사 완료';
 
-        // 태그 목록 렌더링
-        function renderTags() {
-            const container = document.getElementById('tagFilterContainer');
-            const allTags = ['전체'];
-            commands.forEach(cmd => {
-                cmd.tags.forEach(tag => {
-                    if (!allTags.includes(tag)) allTags.push(tag);
-                });
-            });
+        setTimeout(() => {
+            copy.textContent = '📋 원클릭 복사';
+        }, 1400);
 
-            container.innerHTML = allTags.map(tag => {
-                const isActive = currentSelectedTag === tag;
-                const activeClass = isActive 
-                    ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30 border-transparent' 
-                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-400';
-                return `<button onclick="selectTag('${tag}')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all ${activeClass}">${tag}</button>`;
-            }).join('');
-        }
+    }
 
-        function selectTag(tag) {
-            currentSelectedTag = tag;
-            renderTags();
-            renderCommands();
-        }
+    const del = e.target.closest('[data-delete]');
 
-        function resetFilter() {
-            currentSelectedTag = '전체';
-            document.getElementById('searchInput').value = '';
-            renderTags();
-            renderCommands();
-        }
+    if (del && confirm('이 메모를 삭제할까요?')) {
 
-        // 명령어 목록 렌더링
-        function renderCommands() {
-            const grid = document.getElementById('commandGrid');
-            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
-            const noResults = document.getElementById('noResults');
+        memos = memos.filter(
+            x => x.id !== del.dataset.delete
+        );
 
-            const filtered = commands.filter(cmd => {
-                const matchesTag = currentSelectedTag === '전체' || cmd.tags.includes(currentSelectedTag);
-                const matchesSearch = cmd.title.toLowerCase().includes(searchQuery) || 
-                                      cmd.description.toLowerCase().includes(searchQuery) || 
-                                      cmd.code.toLowerCase().includes(searchQuery);
-                return matchesTag && matchesSearch;
-            });
+        save();
+        render();
 
-            if (filtered.length === 0) {
-                grid.innerHTML = '';
-                noResults.classList.remove('hidden');
-                return;
-            }
+    }
 
-            noResults.classList.add('hidden');
-            grid.innerHTML = filtered.map(cmd => {
-                const tagsHtml = cmd.tags.map(t => `<span class="px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-medium">${t}</span>`).join('');
-                
-                const cardId = cmd.id || 'cmd-' + Math.random().toString(36).substring(2, 9);
+});
 
-                return `
-                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
-                        <div class="space-y-3">
-                            <div class="flex items-start justify-between gap-4">
-                                <h3 class="font-bold text-base text-slate-900 dark:text-slate-100 leading-snug">${escapeHtml(cmd.title)}</h3>
-                                <div class="flex items-center space-x-1 shrink-0">
-                                    <button onclick="copyCode('${cardId}')" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 text-xs font-medium transition-colors" title="코드 복사">
-                                        <i class="fa-regular fa-copy"></i>
-                                        <span>복사</span>
-                                    </button>
-                                    <button onclick="downloadCode('${cardId}')" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 text-xs font-medium transition-colors" title="파일 다운로드">
-                                        <i class="fa-solid fa-download"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">${escapeHtml(cmd.description)}</p>
-                            <div class="flex flex-wrap gap-1.5 pt-1">
-                                ${tagsHtml}
-                            </div>
-                        </div>
+// ==================================
+// 9. 메모 추가 창
+// ==================================
 
-                        <!-- 코드 블록 -->
-                        <div class="relative rounded-2xl bg-slate-900 text-slate-200 p-4 font-mono text-xs overflow-x-auto max-h-52 border border-slate-800">
-                            <pre id="${cardId}" class="whitespace-pre-wrap">${escapeHtml(cmd.code)}</pre>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
+$('showAdd').onclick = () => {
 
-        // 원버튼 복사 기능 (iframe 환경 대응 execCommand 활용)
-        function copyCode(elementId) {
-            const codeElem = document.getElementById(elementId);
-            if (!codeElem) return;
+    $('editor').hidden = false;
+    $('newTitle').focus();
 
-            const text = codeElem.innerText;
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            document.body.appendChild(textarea);
-            textarea.focus();
-            textarea.select();
+};
 
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    showToast('클립보드에 복사되었습니다!');
-                } else {
-                    showToast('복사에 실패했습니다.', true);
-                }
-            } catch (err) {
-                showToast('클립보드 복사 권한이 없습니다.', true);
-            }
+$('cancelMemo').onclick = () => {
 
-            document.body.removeChild(textarea);
-        }
+    $('editor').hidden = true;
 
-        // 파일 다운로드 기능
-        function downloadCode(elementId) {
-            const codeElem = document.getElementById(elementId);
-            if (!codeElem) return;
+};
 
-            const cardElement = codeElem.closest('.bg-white');
-            const titleElem = cardElement ? cardElement.querySelector('h3') : null;
-            const titleText = titleElem ? titleElem.innerText.trim() : 'script';
-            
-            const foundCmd = commands.find(c => c.title === titleText);
-            const ext = foundCmd ? foundCmd.extension : 'ps1';
+// ==================================
+// 10. 메모 저장
+// ==================================
 
-            const blob = new Blob([codeElem.innerText], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${titleText.replace(/[\s/\\?%*:|"<>]/g, '_')}.${ext}`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+$('saveMemo').onclick = () => {
 
-            showToast('파일이 다운로드되었습니다!');
-        }
+    const title = $('newTitle').value.trim();
+    const code = $('newCode').value.trim();
 
-        // 토스트 알림 표시
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            toastMessage.innerText = message;
+    if (!title || !code) {
 
-            if (isError) {
-                toast.classList.add('bg-rose-600', 'text-white');
-            } else {
-                toast.classList.remove('bg-rose-600', 'text-white');
-            }
+        alert('제목과 명령어를 입력하세요.');
+        return;
 
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 2500);
-        }
+    }
 
-        // 모달 제어
-        function openAddModal() {
-            document.getElementById('addModal').classList.remove('hidden');
-            document.getElementById('addModal').classList.add('flex');
-        }
+    memos.push({
 
-        function closeAddModal() {
-            document.getElementById('addModal').classList.remove('flex');
-            document.getElementById('addModal').classList.add('hidden');
-            document.getElementById('commandForm').reset();
-        }
+        id: 'm' + Date.now(),
+        title: title,
+        cat: $('newCat').value,
+        desc: $('newDesc').value.trim(),
+        code: code
 
-        // 새 명령어 등록 처리 (로컬스토리지 저장)
-        function handleFormSubmit(event) {
-            event.preventDefault();
-            const title = document.getElementById('newTitle').value.trim();
-            const description = document.getElementById('newDesc').value.trim();
-            const rawTags = document.getElementById('newTags').value.trim();
-            const extension = document.getElementById('newExt').value;
-            const code = document.getElementById('newCode').value;
+    });
 
-            const tags = rawTags.split(',').map(t => t.trim()).filter(t => t.length > 0);
+    save();
 
-            const newCommand = {
-                id: 'cmd-' + Date.now(),
-                title,
-                description,
-                tags,
-                extension,
-                code
-            };
+    $('newTitle').value = '';
+    $('newDesc').value = '';
+    $('newCode').value = '';
 
-            commands.unshift(newCommand);
-            localStorage.setItem('it_commands', JSON.stringify(commands));
+    $('editor').hidden = true;
 
-            closeAddModal();
-            renderTags();
-            renderCommands();
-            showToast('새 스크립트가 성공적으로 등록되었습니다!');
-        }
+    active = '전체';
 
-        // HTML 특수문자 이스케이프 유틸
-        function escapeHtml(text) {
-            return text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-    </script>
+    render();
+
+};
+
+// ==================================
+// 11. 최초 실행
+// ==================================
+
+render();
+
+</script>
+
 </body>
 </html>
