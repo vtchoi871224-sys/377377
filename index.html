@@ -433,7 +433,7 @@ code:'sfc /scannow'
 },
 {
 id:'laptopinfo',
-title:'장비 정보 GUI',
+title:'노트북 장비 정보 GUI',
 cat:'PowerShell',
 desc:'사용자, PC 이름, 모델명, BIOS 날짜, 시리얼, IP, MAC 주소 표시',
 code:`Add-Type -AssemblyName System.Windows.Forms
@@ -468,7 +468,7 @@ $mac = if ($nic) {
 
 # 3. GUI 창 생성
 $form = New-Object System.Windows.Forms.Form
-$form.Text = '노트북 장비 정보'
+$form.Text = '장비 정보'
 $form.Size = New-Object System.Drawing.Size(500, 490)
 $form.StartPosition = 'CenterScreen'
 $form.BackColor = [System.Drawing.Color]::White
@@ -478,7 +478,7 @@ $form.KeyPreview = $true
 
 # 4. 제목 라벨
 $title = New-Object System.Windows.Forms.Label
-$title.Text = '노트북 장비 정보'
+$title.Text = '장비 정보'
 $title.Font = New-Object System.Drawing.Font('맑은 고딕', 18, [System.Drawing.FontStyle]::Bold)
 $title.Location = New-Object System.Drawing.Point(30, 20)
 $title.Size = New-Object System.Drawing.Size(420, 45)
