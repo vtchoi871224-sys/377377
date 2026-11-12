@@ -1,20 +1,21 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IT 명령어 메모.</title>
+<title>Command Archive</title>
 
 <style>
 :root {
-    --bg: #f4f6fb;
-    --white: #fff;
-    --blue: #315efb;
-    --text: #172033;
-    --muted: #667085;
-    --line: #e5e9f2;
-    --code: #101828;
+    --bg: #fafafa;
+    --white: #ffffff;
+    --primary: #18181b;
+    --accent: #2563eb;
+    --text: #27272a;
+    --muted: #71717a;
+    --line: #e4e4e7;
+    --code-bg: #18181b;
+    --code-text: #f4f4f5;
 }
 
 * { box-sizing: border-box; }
@@ -23,91 +24,124 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: "Malgun Gothic", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Malgun Gothic", sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
 header {
-    background: linear-gradient(120deg,#14213d,#315efb);
-    color: white;
-    padding: 30px 25px;
+    background: var(--white);
+    border-bottom: 1px solid var(--line);
+    padding: 24px 32px;
+}
+
+.header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 header h1 {
-    margin: 0 0 8px;
-    font-size: 28px;
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
 }
 
-header p { color: #dbe5ff; }
-
 main {
-    max-width: 1180px;
-    margin: 24px auto;
-    padding: 0 18px;
+    max-width: 1200px;
+    margin: 32px auto;
+    padding: 0 24px;
 }
 
 .toolbar {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
 }
 
 input, select, textarea {
     font: inherit;
     border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 11px 13px;
-    background: white;
+    border-radius: 8px;
+    padding: 10px 14px;
+    background: var(--white);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
 }
 
 #search {
     flex: 1;
-    min-width: 220px;
+    min-width: 240px;
 }
 
 button {
     border: 0;
-    border-radius: 9px;
-    padding: 10px 14px;
-    font-weight: bold;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 500;
+    font-size: 14px;
     cursor: pointer;
-    background: var(--blue);
+    background: var(--primary);
     color: white;
+    transition: opacity 0.2s;
+}
+
+button:hover {
+    opacity: 0.9;
 }
 
 button.secondary {
-    background: #eaf0ff;
-    color: #2448c7;
+    background: var(--white);
+    color: var(--text);
+    border: 1px solid var(--line);
+}
+
+button.secondary:hover {
+    background: #f4f4f5;
 }
 
 button.ghost {
-    background: #eef0f5;
-    color: #344054;
+    background: transparent;
+    color: var(--muted);
+    padding: 6px 10px;
+}
+
+button.ghost:hover {
+    color: var(--text);
+    background: #f4f4f5;
 }
 
 .layout {
     display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 18px;
+    grid-template-columns: 200px 1fr;
+    gap: 24px;
     align-items: start;
 }
 
-aside, .card, .editor {
-    background: white;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-}
-
 aside {
-    padding: 14px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
     position: sticky;
-    top: 15px;
+    top: 24px;
 }
 
 aside h3 {
-    margin: 4px 8px 12px;
-    font-size: 14px;
+    margin: 8px 12px 10px;
+    font-size: 12px;
+    font-weight: 600;
     color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .cat {
@@ -115,111 +149,137 @@ aside h3 {
     width: 100%;
     text-align: left;
     background: transparent;
-    color: #344054;
-    margin: 3px 0;
+    color: var(--text);
+    margin: 2px 0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.cat:hover {
+    background: #f4f4f5;
 }
 
 .cat.active {
-    background: #eaf0ff;
-    color: #2448c7;
+    background: #eff6ff;
+    color: var(--accent);
+    font-weight: 500;
 }
 
 #count {
     font-size: 13px;
     color: var(--muted);
+    margin-bottom: 16px;
 }
 
 .cards {
     display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(290px, 1fr)
-    );
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
 }
 
 .card {
-    padding: 16px;
-    min-width: 0;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .cardtop {
     display: flex;
     justify-content: space-between;
-    gap: 8px;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
 }
 
 .card h3 {
     font-size: 16px;
-    margin: 0 0 7px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.3px;
 }
 
 .tag {
     font-size: 11px;
-    color: #3152b8;
-    background: #edf2ff;
-    border-radius: 20px;
-    padding: 5px 8px;
+    font-weight: 500;
+    color: var(--accent);
+    background: #eff6ff;
+    border-radius: 6px;
+    padding: 4px 8px;
     white-space: nowrap;
 }
 
 .desc {
     font-size: 13px;
     color: var(--muted);
-    margin-bottom: 12px;
+    margin: 0 0 16px 0;
+    line-height: 1.4;
 }
 
 pre {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
-    background: var(--code);
-    color: #e6edf7;
-    border-radius: 10px;
-    padding: 13px;
-    font: 12px/1.55 Consolas, monospace;
-    max-height: 230px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: 8px;
+    padding: 14px;
+    font: 12px/1.5 Consolas, Monaco, monospace;
+    max-height: 220px;
     overflow: auto;
+    margin: 0 0 16px 0;
 }
 
 .actions {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
+    align-items: center;
 }
 
 .actions button {
     font-size: 12px;
-    padding: 8px 11px;
+    padding: 7px 12px;
 }
 
 .empty {
-    background: white;
-    border: 1px dashed #cbd3e1;
-    border-radius: 14px;
-    padding: 30px;
+    background: var(--white);
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    padding: 48px;
     text-align: center;
     color: var(--muted);
+    grid-column: 1 / -1;
 }
 
 .editor {
-    margin-top: 20px;
-    padding: 17px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-top: 24px;
+    padding: 24px;
 }
 
 .editor h2 {
-    font-size: 18px;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
 }
 
 .fields {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: 1fr 200px;
+    gap: 12px;
+    margin-bottom: 12px;
 }
 
 .fields textarea {
     grid-column: 1 / -1;
-    min-height: 130px;
-    font-family: Consolas, monospace;
+    min-height: 140px;
+    font-family: Consolas, Monaco, monospace;
 }
 
 .editor input,
@@ -228,22 +288,10 @@ pre {
     width: 100%;
 }
 
-.editor .actions {
-    margin-top: 10px;
-}
-
-footer {
-    text-align: center;
-    color: var(--muted);
-    font-size: 12px;
-    padding: 25px;
-}
-
-@media(max-width:720px) {
+@media(max-width: 768px) {
     .layout { grid-template-columns: 1fr; }
     aside { position: static; }
     .fields { grid-template-columns: 1fr; }
-    .fields textarea { grid-column: auto; }
 }
 </style>
 </head>
@@ -251,49 +299,39 @@ footer {
 <body>
 
 <header>
-    <!--<h1>🛠️ IT 명령어 메모</h1>
-    <p>Windows · PowerShell · 네트워크 · 하드웨어 · Linux 명령어 관리</p>-->
+    <div class="header-inner">
+        <h1>Command Archive</h1>
+    </div>
 </header>
 
 <main>
 
 <div class="toolbar">
-    <input
-        id="search"
-        placeholder="명령어 또는 설명 검색..."
-    >
-
+    <input id="search" placeholder="검색어 입력...">
     <select id="sortCat">
-        <option value="전체">전체 카테고리</option>
+        <option value="전체">모든 카테고리</option>
     </select>
-
-    <button class="secondary" id="showAdd">
-        ＋ 메모 추가
-    </button>
+    <button class="secondary" id="showAdd">＋ 새로 만들기</button>
 </div>
 
 <div class="layout">
 
 <aside>
-    <h3>카테고리</h3>
+    <h3>Categories</h3>
     <div id="categories"></div>
 </aside>
 
 <section>
-    <p id="count"></p>
+    <div id="count"></div>
     <div class="cards" id="cards"></div>
 </section>
 
 </div>
 
 <section class="editor" id="editor" hidden>
-
-    <h2>새 명령어 메모</h2>
-
+    <h2>새 메모 추가</h2>
     <div class="fields">
-
         <input id="newTitle" placeholder="제목">
-
         <select id="newCat">
             <option>Windows</option>
             <option>PowerShell</option>
@@ -303,35 +341,19 @@ footer {
             <option>부팅·복구</option>
             <option>기타</option>
         </select>
-
-        <input id="newDesc" placeholder="설명">
-
-        <textarea id="newCode"
-            placeholder="명령어 입력"></textarea>
-
+        <input id="newDesc" placeholder="간단한 설명">
+        <textarea id="newCode" placeholder="실행 명령어 코드"></textarea>
     </div>
-
     <div class="actions">
-        <button id="saveMemo">저장</button>
-        <button class="ghost" id="cancelMemo">취소</button>
+        <button id="saveMemo">저장하기</button>
+        <button class="secondary" id="cancelMemo">취소</button>
     </div>
-
 </section>
 
 </main>
 
-<footer>
-    메모는 현재 브라우저에 자동 저장됩니다.
-</footer>
-
 <script>
-
-// ==================================
-// 1. 기본 명령어 데이터
-// ==================================
-
 const defaults = [
-
 {
 id:'ipconfig',
 title:'IP 설정 전체 확인',
@@ -339,7 +361,6 @@ cat:'네트워크',
 desc:'IP, 게이트웨이, DNS 정보 확인',
 code:'ipconfig /all'
 },
-
 {
 id:'flushdns',
 title:'DNS 캐시 초기화',
@@ -347,7 +368,6 @@ cat:'네트워크',
 desc:'DNS 캐시 초기화',
 code:'ipconfig /flushdns'
 },
-
 {
 id:'ping',
 title:'연결 상태 확인',
@@ -355,7 +375,6 @@ cat:'네트워크',
 desc:'대상 IP 연결 테스트',
 code:'ping 8.8.8.8'
 },
-
 {
 id:'port',
 title:'TCP 포트 연결 테스트',
@@ -363,7 +382,6 @@ cat:'네트워크',
 desc:'특정 포트 연결 여부 확인',
 code:'Test-NetConnection 192.168.0.10 -Port 8001'
 },
-
 {
 id:'netstat',
 title:'열린 포트 확인',
@@ -371,7 +389,6 @@ cat:'네트워크',
 desc:'네트워크 연결 및 PID 확인',
 code:'netstat -ano'
 },
-
 {
 id:'adapter',
 title:'네트워크 어댑터 상태',
@@ -379,15 +396,6 @@ cat:'네트워크',
 desc:'네트워크 카드 상태 및 속도',
 code:'Get-NetAdapter | Format-Table Name, Status, LinkSpeed'
 },
-
-{
-id:'ips',
-title:'IPv4 주소 확인',
-cat:'네트워크',
-desc:'IPv4 주소 확인',
-code:"Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceAlias -notmatch 'Loopback' -and $_.IPAddress -notlike '169.254*' } | Format-Table InterfaceAlias, IPAddress"
-},
-
 {
 id:'bios',
 title:'BIOS 및 시리얼 확인',
@@ -395,7 +403,6 @@ cat:'하드웨어',
 desc:'BIOS 버전, 날짜, 제조번호',
 code:'Get-CimInstance Win32_BIOS | Format-List Manufacturer, SMBIOSBIOSVersion, ReleaseDate, SerialNumber'
 },
-
 {
 id:'model',
 title:'PC 모델 및 제조사',
@@ -403,15 +410,6 @@ cat:'하드웨어',
 desc:'컴퓨터 모델명 확인',
 code:'Get-CimInstance Win32_ComputerSystem | Format-List Manufacturer, Model'
 },
-
-{
-id:'board',
-title:'메인보드 정보',
-cat:'하드웨어',
-desc:'메인보드 제품 및 제조사',
-code:'Get-CimInstance Win32_BaseBoard | Format-List Manufacturer, Product, SerialNumber'
-},
-
 {
 id:'ram',
 title:'메모리 정보',
@@ -419,15 +417,6 @@ cat:'하드웨어',
 desc:'RAM 용량, 속도, 제조사',
 code:'Get-CimInstance Win32_PhysicalMemory | Select-Object DeviceLocator, Capacity, Speed, ConfiguredClockSpeed, Manufacturer, PartNumber'
 },
-
-{
-id:'disk',
-title:'디스크 정보',
-cat:'하드웨어',
-desc:'디스크 모델 및 파티션 형식',
-code:'Get-Disk | Format-Table Number, FriendlyName, SerialNumber, PartitionStyle, HealthStatus, Size -Auto'
-},
-
 {
 id:'sysinfo',
 title:'시스템 정보 실행',
@@ -435,15 +424,6 @@ cat:'Windows',
 desc:'Windows 시스템 정보 창 실행',
 code:'msinfo32'
 },
-
-{
-id:'winver',
-title:'Windows 버전 확인',
-cat:'Windows',
-desc:'Windows 버전 및 빌드 확인',
-code:'winver'
-},
-
 {
 id:'sfc',
 title:'시스템 파일 검사',
@@ -451,50 +431,12 @@ cat:'Windows',
 desc:'손상된 Windows 파일 검사 및 복구',
 code:'sfc /scannow'
 },
-
-{
-id:'dism',
-title:'Windows 이미지 복구',
-cat:'Windows',
-desc:'Windows 구성 요소 저장소 복구',
-code:'DISM /Online /Cleanup-Image /RestoreHealth'
-},
-
-{
-id:'services',
-title:'Windows 업데이트 서비스 확인',
-cat:'Windows',
-desc:'업데이트 관련 서비스 상태',
-code:"Get-Service wuauserv, bits, cryptsvc, UsoSvc | Format-Table Name, Status, StartType -Auto"
-},
-
-{
-id:'firewall',
-title:'방화벽 상태 확인',
-cat:'Windows',
-desc:'방화벽 프로필 상태',
-code:'Get-NetFirewallProfile | Format-Table Name, Enabled'
-},
-
-{
-id:'hostname',
-title:'랜덤 PC 이름 생성',
-cat:'Windows',
-desc:'DESKTOP- 뒤에 7자리 랜덤 이름 생성 및 변경',
-code:"$name = 'DESKTOP-' + (-join ((65..90) + (48..57) | Get-Random -Count 7 | ForEach-Object { [char]$_ }))\nRename-Computer -NewName $name"
-},
-
-// ==================================
-// 노트북 장비 정보 GUI
-// ==================================
-
 {
 id:'laptopinfo',
 title:'노트북 장비 정보 GUI',
 cat:'PowerShell',
 desc:'사용자, PC 이름, 모델명, BIOS 날짜, 시리얼, IP, MAC 주소 표시',
-code:String.raw`
-Add-Type -AssemblyName System.Windows.Forms
+code:`Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 # 1. 장비 정보 수집
@@ -518,7 +460,6 @@ $date = if ($bios.ReleaseDate) {
 } else { '확인 불가' }
 
 $ipaddr = if ($ip) { $ip.IPAddress } else { '확인 불가' }
-
 $mac = if ($nic) {
     $nic.MacAddress -replace '-', ':'
 } else {
@@ -543,7 +484,7 @@ $title.Location = New-Object System.Drawing.Point(30, 20)
 $title.Size = New-Object System.Drawing.Size(420, 45)
 $form.Controls.Add($title)
 
-# 5. 표시 항목 정의
+# 5. 표시 항목 정의 (베이스보드 Product 정보 반영)
 $items = @(
     @('유저네임', $env:USERNAME),
     @('호스트 네임', $env:COMPUTERNAME),
@@ -591,10 +532,8 @@ $form.Add_KeyDown({
 })
 
 # 8. GUI 실행
-[void]$form.ShowDialog()
-`
+[void]$form.ShowDialog()`
 },
-
 {
 id:'linuxip',
 title:'Linux IP 주소 확인',
@@ -602,55 +541,16 @@ cat:'Linux',
 desc:'네트워크 인터페이스 IP 확인',
 code:'ip -br addr'
 },
-
 {
 id:'route',
 title:'Linux 라우팅 확인',
 cat:'Linux',
 desc:'기본 게이트웨이 및 라우팅 확인',
 code:'ip route'
-},
-
-{
-id:'lsusb',
-title:'USB 장치 확인',
-cat:'Linux',
-desc:'연결된 USB 장치 목록',
-code:'lsusb'
-},
-
-{
-id:'lspci',
-title:'PCI 장치 확인',
-cat:'Linux',
-desc:'PCI 장치 및 드라이버 확인',
-code:'lspci -nnk'
-},
-
-{
-id:'boot',
-title:'MBR / GPT 확인',
-cat:'부팅·복구',
-desc:'디스크 파티션 형식 확인',
-code:'Get-Disk | Format-Table Number, PartitionStyle, IsBoot, IsSystem'
-},
-
-{
-id:'bcd',
-title:'부팅 구성 확인',
-cat:'부팅·복구',
-desc:'BCD 부팅 항목 확인',
-code:'bcdedit /enum all'
 }
-
 ];
 
-// ==================================
-// 2. 저장 데이터 불러오기
-// ==================================
-
-const KEY = 'itCommandMemos_v1';
-
+const KEY = 'commandArchive_v2';
 let saved = [];
 
 try {
@@ -666,262 +566,130 @@ let memos = [
 ];
 
 let active = '전체';
-
 const $ = id => document.getElementById(id);
 
-// ==================================
-// 3. 데이터 저장
-// ==================================
-
 function save() {
-
-    localStorage.setItem(
-        KEY,
-        JSON.stringify(memos.filter(x => !x.builtin))
-    );
-
+    localStorage.setItem(KEY, JSON.stringify(memos.filter(x => !x.builtin)));
 }
-
-// ==================================
-// 4. HTML 특수문자 처리
-// ==================================
 
 function esc(s) {
-
-    return String(s ?? '').replace(
-        /[&<>"']/g,
-        c => ({
-            '&':'&amp;',
-            '<':'&lt;',
-            '>':'&gt;',
-            '"':'&quot;',
-            "'":'&#39;'
-        }[c])
-    );
-
+    return String(s ?? '').replace(/[&<>"']/g, c => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+    }[c]));
 }
 
-// ==================================
-// 5. 화면 렌더링
-// ==================================
-
 function render() {
-
-    const cats = [
-        '전체',
-        ...new Set(memos.map(x => x.cat))
-    ];
+    const cats = ['전체', ...new Set(memos.map(x => x.cat))];
 
     $('categories').innerHTML = cats.map(c => `
-        <button class="cat ${active === c ? 'active' : ''}"
-            data-cat="${esc(c)}">
+        <button class="cat ${active === c ? 'active' : ''}" data-cat="${esc(c)}">
             ${esc(c)}
         </button>
     `).join('');
 
-    $('sortCat').innerHTML =
-        '<option value="전체">전체 카테고리</option>' +
-        cats.filter(c => c !== '전체')
-            .map(c => `<option value="${esc(c)}">${esc(c)}</option>`)
-            .join('');
-
+    $('sortCat').innerHTML = cats.map(c => `<option value="${esc(c)}">${esc(c === '전체' ? '모든 카테고리' : c)}</option>`).join('');
     $('sortCat').value = active;
 
     const q = $('search').value.trim().toLowerCase();
-
-    const list = memos.filter(x =>
+    const list = memos.filter(x => 
         (active === '전체' || x.cat === active) &&
-        [x.title, x.desc, x.code, x.cat]
-            .join(' ')
-            .toLowerCase()
-            .includes(q)
+        [x.title, x.desc, x.code, x.cat].join(' ').toLowerCase().includes(q)
     );
 
-    $('count').textContent =
-        `총 ${list.length}개 명령어`;
+    $('count').textContent = `총 ${list.length}개의 항목`;
 
-    $('cards').innerHTML = list.length
-        ? list.map(x => `
-            <article class="card">
-
+    $('cards').innerHTML = list.length ? list.map(x => `
+        <article class="card">
+            <div>
                 <div class="cardtop">
                     <h3>${esc(x.title)}</h3>
                     <span class="tag">${esc(x.cat)}</span>
                 </div>
-
                 <p class="desc">${esc(x.desc)}</p>
-
                 <pre>${esc(x.code)}</pre>
-
-                <div class="actions">
-
-                    <button data-copy="${esc(x.id)}">
-                        📋 원클릭 복사
-                    </button>
-
-                    ${x.builtin ? '' : `
-                        <button class="ghost"
-                            data-delete="${esc(x.id)}">
-                            삭제
-                        </button>
-                    `}
-
-                </div>
-
-            </article>
-        `).join('')
-        : '<div class="empty">검색 결과가 없습니다.</div>';
-
+            </div>
+            <div class="actions">
+                <button data-copy="${esc(x.id)}">복사하기</button>
+                ${x.builtin ? '' : `<button class="ghost" data-delete="${esc(x.id)}">삭제</button>`}
+            </div>
+        </article>
+    `).join('') : '<div class="empty">검색 결과가 없습니다.</div>';
 }
 
-// ==================================
-// 6. 카테고리 클릭
-// ==================================
-
 $('categories').addEventListener('click', e => {
-
     const b = e.target.closest('[data-cat]');
-
-    if (b) {
-        active = b.dataset.cat;
-        render();
-    }
-
+    if (b) { active = b.dataset.cat; render(); }
 });
 
 $('sortCat').addEventListener('change', e => {
-
     active = e.target.value;
     render();
-
 });
-
-// ==================================
-// 7. 검색
-// ==================================
 
 $('search').addEventListener('input', render);
 
-// ==================================
-// 8. 원클릭 복사 및 삭제
-// ==================================
-
 $('cards').addEventListener('click', async e => {
-
     const copy = e.target.closest('[data-copy]');
-
     if (copy) {
-
-        const item = memos.find(
-            x => x.id === copy.dataset.copy
-        );
-
+        const item = memos.find(x => x.id === copy.dataset.copy);
         if (!item) return;
-
         try {
-
             await navigator.clipboard.writeText(item.code);
-
         } catch {
-
             const t = document.createElement('textarea');
             t.value = item.code;
-
             document.body.appendChild(t);
             t.select();
             document.execCommand('copy');
             t.remove();
-
         }
-
-        const original = '📋 원클릭 복사';
-        copy.textContent = '✓ 복사 완료';
-
-        setTimeout(() => {
-            copy.textContent = original;
-        }, 1400);
-
+        const original = '복사하기';
+        copy.textContent = '완료';
+        setTimeout(() => { copy.textContent = original; }, 1200);
     }
 
     const del = e.target.closest('[data-delete]');
-
-    if (del && confirm('이 메모를 삭제할까요?')) {
-
-        memos = memos.filter(
-            x => x.id !== del.dataset.delete
-        );
-
+    if (del && confirm('정말 삭제하시겠습니까?')) {
+        memos = memos.filter(x => x.id !== del.dataset.delete);
         save();
         render();
-
     }
-
 });
 
-// ==================================
-// 9. 메모 추가 창
-// ==================================
-
 $('showAdd').onclick = () => {
-
     $('editor').hidden = false;
     $('newTitle').focus();
-
 };
 
 $('cancelMemo').onclick = () => {
-
     $('editor').hidden = true;
-
 };
 
-// ==================================
-// 10. 메모 저장
-// ==================================
-
 $('saveMemo').onclick = () => {
-
     const title = $('newTitle').value.trim();
     const code = $('newCode').value.trim();
-
     if (!title || !code) {
-
-        alert('제목과 명령어를 입력하세요.');
+        alert('제목과 명령어를 입력해주세요.');
         return;
-
     }
-
     memos.push({
-
         id: 'm' + Date.now(),
         title: title,
         cat: $('newCat').value,
         desc: $('newDesc').value.trim(),
         code: code,
         builtin: false
-
     });
-
     save();
-
     $('newTitle').value = '';
     $('newDesc').value = '';
     $('newCode').value = '';
-
     $('editor').hidden = true;
-
     active = '전체';
-
     render();
-
 };
 
-// ==================================
-// 11. 최초 실행
-// ==================================
-
 render();
-
 </script>
 
 </body>
