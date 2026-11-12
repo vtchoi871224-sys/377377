@@ -204,7 +204,7 @@ footer{
         <p>자주 사용하는 스크립트를 보관하고 버튼 한 번으로 복사하세요.</p>
     </div>
 
-    <!-- 우측 상단 방문자 통계 (DB 없는 가상 카운터 - 에러 없음) -->
+    <!-- 우측 상단 방문자 통계 (DB 없는 가상 카운터) -->
     <div class="stats">
         <div class="stat">
             <span class="stat-label">누적 방문자</span>
@@ -250,7 +250,7 @@ footer{
 <pre><code id="psCode">Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
-# 장비 정보 수집
+# 장비 정보 수집 (msinfo32 베이스보드 정보 포함)
 $bios = Get-CimInstance Win32_BIOS
 $board = Get-CimInstance Win32_BaseBoard
 $ip = Get-NetIPAddress -AddressFamily IPv4 |
@@ -263,17 +263,12 @@ $nic = Get-NetAdapter |
    Where-Object Status -eq 'Up' |
    Select-Object -First 1
 
-# 날짜 및 네트워크 정보
-$date = if ($bios.ReleaseDate) {
-   $bios.ReleaseDate.ToString('yyyy-MM-dd')
-} else { '확인 불가' }
-
+# 수집된 정보 문자열 처리
+$model = if ($board.Product) { $board.Product.Trim() } else { '확인 불가' }
+$date = if ($bios.ReleaseDate) { $bios.ReleaseDate.ToString('yyyy-MM-dd') } else { '확인 불가' }
 $ipaddr = if ($ip) { $ip.IPAddress } else { '확인 불가' }
-$mac = if ($nic) {
-   $nic.MacAddress -replace '-', ':'
-} else {
-   '확인 불가'
-}
+$mac = if ($nic) { $nic.MacAddress -replace '-', ':' } else { '확인 불가' }
+$serial = if ($bios.SerialNumber) { $bios.SerialNumber.Trim() } else { '확인 불가' }
 
 # GUI 생성
 $form = New-Object System.Windows.Forms.Form
@@ -295,15 +290,15 @@ $title.Location = New-Object System.Drawing.Point(30,20)
 $title.Size = New-Object System.Drawing.Size(420,45)
 $form.Controls.Add($title)
 
-# 표시 항목 (베이스보드 Product로 변경)
+# 표시 항목 (베이스보드 모델명 매핑)
 $items = @(
-   @('유저네임',$env:USERNAME),
-   @('호스트 네임',$env:COMPUTERNAME),
-   @('모델명',$board.Product),
-   @('BIOS 날짜',$date),
-   @('제조번호',$bios.SerialNumber),
-   @('IP 주소',$ipaddr),
-   @('MAC 주소',$mac)
+   @('유저네임', $env:USERNAME),
+   @('호스트 네임', $env:COMPUTERNAME),
+   @('모델명', $model),
+   @('BIOS 날짜', $date),
+   @('제조번호', $serial),
+   @('IP 주소', $ipaddr),
+   @('MAC 주소', $mac)
 )
 
 $y = 85
