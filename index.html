@@ -1,208 +1,703 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IT Hub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IT Hub - 코드 메모장</title>
 
 <style>
+:root{
+    --bg:#0b1220;
+    --panel:#151f31;
+    --panel2:#1c2940;
+    --line:#2b3a52;
+    --text:#e8eef8;
+    --muted:#9aabc3;
+    --accent:#60a5fa;
+}
+*{box-sizing:border-box}
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"맑은 고딕",Arial,sans-serif;
+}
+header{
+    min-height:88px;
+    padding:18px 4%;
+    border-bottom:1px solid var(--line);
+    background:#101a2b;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:18px;
+}
+.brand h1{margin:0;font-size:24px}
+.brand p{margin:7px 0 0;color:var(--muted);font-size:13px}
+
+.stats{
+    display:flex;
+    align-items:stretch;
+    gap:9px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+.stat{
+    min-width:105px;
+    padding:9px 12px;
+    background:var(--panel2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    text-align:center;
+}
+.stat-label{
+    display:block;
+    color:var(--muted);
+    font-size:11px;
+    margin-bottom:4px;
+}
+.stat-value{
+    font-size:19px;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+}
+.stat-value.loading{
+    color:var(--muted);
+    font-size:14px;
+}
+
+main{
+    max-width:1200px;
+    margin:0 auto;
+    padding:26px clamp(14px,3vw,32px);
+}
+.toolbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-bottom:18px;
+}
+.tab{
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--text);
+    padding:10px 16px;
+    border-radius:9px;
+    cursor:pointer;
+}
+.tab.active{
+    background:#1d4b7e;
+    border-color:#397fc0;
+}
+.search{
+    margin-left:auto;
+    max-width:280px;
+    min-width:180px;
+    padding:10px 12px;
+    border-radius:9px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--text);
+}
+.memo{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    margin-bottom:20px;
+}
+.memo-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:15px 18px;
+    background:var(--panel2);
+    border-bottom:1px solid var(--line);
+}
+.memo-head h2{font-size:16px;margin:0}
+.meta{font-size:12px;color:var(--muted);margin-top:4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button.action{
+    border:0;
+    border-radius:8px;
+    padding:9px 13px;
+    font-weight:600;
+    cursor:pointer;
+    background:var(--accent);
+    color:#071426;
+}
+button.action:active{transform:scale(.98)}
+pre{
+    margin:0;
+    padding:18px;
+    overflow:auto;
+    max-height:62vh;
+    line-height:1.55;
+    font:13px/1.6 Consolas,"Cascadia Code",monospace;
+    white-space:pre;
+}
+pre code{color:#dce8f8}
+.empty{
+    display:none;
+    color:var(--muted);
+    padding:24px;
+    text-align:center;
+}
+.toast{
+    position:fixed;
+    bottom:22px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#123d35;
+    color:#d1fae5;
+    padding:11px 18px;
+    border:1px solid #23745f;
+    border-radius:10px;
+    opacity:0;
+    pointer-events:none;
+    transition:.2s;
+}
+.toast.show{opacity:1}
+footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+    padding:10px 20px 28px;
+}
+
+@media(max-width:700px){
+    header{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+    .stats{
+        width:100%;
+        justify-content:flex-start;
+    }
+    .stat{
+        flex:1;
+        min-width:90px;
+    }
+}
+@media(max-width:600px){
+    .memo-head{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+    .search{
+        margin-left:0;
+        max-width:none;
+        width:100%;
+    }
+    pre{font-size:12px}
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<header>
+    <div class="brand">
+        <h1>📝 IT Hub 코드 메모장</h1>
+        <p>자주 사용하는 스크립트를 보관하고 버튼 한 번으로 복사하세요.</p>
+    </div>
+
+    <!-- 우측 상단 방문자 통계 -->
+    <div class="stats">
+
+        <div class="stat">
+            <span class="stat-label">누적 방문자</span>
+            <span class="stat-value loading" id="totalVisitors">집계 중</span>
+        </div>
+
+        <div class="stat">
+            <span class="stat-label">오늘 방문자</span>
+            <span class="stat-value loading" id="todayVisitors">집계 중</span>
+        </div>
+
+        <div class="stat">
+            <span class="stat-label">페이지 조회수</span>
+            <span class="stat-value loading" id="pageViews">집계 중</span>
+        </div>
+
+        <div class="stat">
+            <span class="stat-label">현재 접속자</span>
+            <span class="stat-value loading" id="activeVisitors">집계 중</span>
+        </div>
+
+    </div>
+</header>
+
+<main>
+
+    <div class="toolbar">
+        <button class="tab active" data-filter="all">전체 메모</button>
+        <button class="tab" data-filter="powershell">PowerShell</button>
+        <button class="tab" data-filter="html">HTML</button>
+        <input class="search" id="search"
+               type="search" placeholder="메모 검색...">
+    </div>
+
+    <!-- PowerShell 메모 -->
+    <section class="memo" data-type="powershell">
+
+        <div class="memo-head">
+            <div>
+                <h2>노트북 장비 정보 수집 GUI</h2>
+                <div class="meta">
+                    PowerShell · 장비 정보 표시 및 K 키 종료
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="action"
+                    onclick="copyCode('psCode',this)">
+                    📋 코드 전체 복사
+                </button>
+            </div>
+        </div>
+
+<pre><code id="psCode">Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+# 장비 정보 수집
+$bios = Get-CimInstance Win32_BIOS
+
+$ip = Get-NetIPAddress -AddressFamily IPv4 |
+   Where-Object {
+       $_.InterfaceAlias -notmatch 'Loopback' -and
+       $_.IPAddress -notlike '169.254*'
+   } | Select-Object -First 1
+
+$nic = Get-NetAdapter |
+   Where-Object Status -eq 'Up' |
+   Select-Object -First 1
+
+# 날짜 및 네트워크 정보
+$date = if ($bios.ReleaseDate) {
+   $bios.ReleaseDate.ToString('yyyy-MM-dd')
+} else { '확인 불가' }
+
+$ipaddr = if ($ip) {
+   $ip.IPAddress
+} else { '확인 불가' }
+
+$mac = if ($nic) {
+   $nic.MacAddress -replace '-', ':'
+} else {
+   '확인 불가'
+}
+
+# GUI 생성
+$form = New-Object System.Windows.Forms.Form
+$form.Text = '노트북 장비 정보'
+$form.Size = New-Object System.Drawing.Size(500,440)
+$form.StartPosition = 'CenterScreen'
+$form.BackColor = [System.Drawing.Color]::White
+$form.FormBorderstyle = "FixedDialog"
+$form.MaximizeBox = $false
+$form.KeyPreview = $true
+
+# 제목
+$title = New-Object System.Windows.Forms.Label
+$title.Text = '노트북 장비 정보'
+$title.Font = New-Object System.Drawing.Font(
+   '맑은 고딕',18,[System.Drawing.FontStyle]::Bold
+)
+$title.Location = New-Object System.Drawing.Point(30,20)
+$title.Size = New-Object System.Drawing.Size(420,45)
+$form.Controls.Add($title)
+
+# 표시 항목
+$items = @(
+   @('유저네임',$env:USERNAME),
+   @('호스트 네임',$env:COMPUTERNAME),
+   @('BIOS 날짜',$date),
+   @('제조번호',$bios.SerialNumber),
+   @('IP 주소',$ipaddr),
+   @('MAC 주소',$mac)
+)
+
+$y = 85
+
+foreach ($item in $items) {
+   $label = New-Object System.Windows.Forms.Label
+   $label.Text = $item[0]
+   $label.Location = New-Object System.Drawing.Point(30,$y)
+   $label.Size = New-Object System.Drawing.Size(140,30)
+   $label.Font = New-Object System.Drawing.Font('맑은 고딕',10)
+   $form.Controls.Add($label)
+
+   $value = New-Object System.Windows.Forms.TextBox
+   $value.Text = [string]$item[1]
+   $value.Location = New-Object System.Drawing.Point(175,$y)
+   $value.Size = New-Object System.Drawing.Size(275,30)
+   $value.ReadOnly = $true
+   $value.Font = New-Object System.Drawing.Font('맑은 고딕',10)
+   $form.Controls.Add($value)
+
+   $y += 42
+}
+
+# 닫기 버튼
+$btn = New-Object System.Windows.Forms.Button
+$btn.Text = '닫기 (K)'
+$btn.Location = New-Object System.Drawing.Point(350,350)
+$btn.Size = New-Object System.Drawing.Size(100,35)
+$btn.Add_Click({ $form.Close() })
+$form.Controls.Add($btn)
+
+# K 키로 종료
+$form.Add_KeyDown({
+   if ($_.KeyCode -eq [System.Windows.Forms.Keys]::K) {
+       $form.Close()
+   }
+})
+
+# GUI 실행
+[void]$form.ShowDialog()</code></pre>
+
+    </section>
+
+    <!-- HTML 메모 -->
+    <section class="memo" data-type="html">
+
+        <div class="memo-head">
+            <div>
+                <h2>IT Hub 메모 사이트</h2>
+                <div class="meta">
+                    HTML · Supabase 연동 · 암호 제거 버전
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="action"
+                    onclick="copyCode('htmlCode',this)">
+                    📋 코드 전체 복사
+                </button>
+            </div>
+        </div>
+
+<pre><code id="htmlCode">&lt;!DOCTYPE html&gt;
+&lt;html lang="ko"&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;meta name="viewport" content="width=device-width,initial-scale=1"&gt;
+&lt;title&gt;IT Hub&lt;/title&gt;
+&lt;style&gt;
 body{
     font-family:Arial;
     margin:0;
     background:#111827;
     color:#fff;
-    display:none;
+}
+#app{display:flex;min-height:100vh}
+#left{width:220px;background:#1f2937;padding:15px}
+#right{flex:1;padding:20px}
+input,textarea{width:100%;margin:6px 0;padding:8px;box-sizing:border-box}
+textarea{height:250px}
+button{padding:8px 14px;margin:4px}
+li{cursor:pointer;margin:6px 0}
+@media(max-width:650px){
+  #app{flex-direction:column}
+  #left{width:auto}
+}
+&lt;/style&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div id="app"&gt;
+  &lt;div id="left"&gt;
+    &lt;h3&gt;글목록&lt;/h3&gt;
+    &lt;ul id="list"&gt;&lt;/ul&gt;
+    &lt;button onclick="loadPosts()"&gt;새로고침&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div id="right"&gt;
+    &lt;input id="title" placeholder="제목"&gt;
+    &lt;textarea id="content" placeholder="내용"&gt;&lt;/textarea&gt;
+    &lt;br&gt;
+    &lt;button onclick="save()"&gt;저장&lt;/button&gt;
+    &lt;button onclick="del()"&gt;삭제&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+const url = "https://nokkpkrgwashmjykgpha.supabase.co";
+const key = "sb_publishable_aSoCddigVMqoOL7b5kbJ6w_WrWuSMVT";
+const db = supabase.createClient(url, key);
+let current = null;
+
+async function loadPosts(){
+  const {data, error} = await db.from("posts").select("*").order("id");
+  if(error){alert("목록을 불러오지 못했습니다: " + error.message);return;}
+  list.innerHTML = "";
+  (data || []).forEach(r => {
+    const li = document.createElement("li");
+    li.textContent = r.title;
+    li.onclick = () => {
+      current = r.id;
+      title.value = r.title || "";
+      content.value = r.content || "";
+    };
+    list.appendChild(li);
+  });
 }
 
-#app{
-    display:flex;
-    height:100vh;
+async function save(){
+  const obj = {title:title.value, content:content.value};
+  if(!obj.title.trim()){alert("제목을 입력하세요.");return;}
+  const {error} = current
+    ? await db.from("posts").update(obj).eq("id",current)
+    : await db.from("posts").insert(obj);
+  if(error){alert("저장 실패: " + error.message);return;}
+  current = null;
+  title.value = "";
+  content.value = "";
+  await loadPosts();
 }
 
-#left{
-    width:220px;
-    background:#1f2937;
-    padding:15px;
+async function del(){
+  if(!current){alert("삭제할 메모를 먼저 선택하세요.");return;}
+  if(!confirm("이 메모를 삭제할까요?")) return;
+  const {error} = await db.from("posts").delete().eq("id",current);
+  if(error){alert("삭제 실패: " + error.message);return;}
+  current = null;
+  title.value = "";
+  content.value = "";
+  await loadPosts();
 }
 
-#right{
-    flex:1;
-    padding:20px;
-}
+loadPosts();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
 
-input,textarea{
-    width:100%;
-    margin:6px 0;
-    padding:8px;
-    box-sizing:border-box;
-}
+    </section>
 
-textarea{
-    height:250px;
-}
+    <div class="empty" id="empty">
+        검색 결과가 없습니다.
+    </div>
 
-button{
-    padding:8px 14px;
-    margin:4px;
-}
+</main>
 
-li{
-    cursor:pointer;
-    margin:6px 0;
-}
-</style>
+<footer>IT Hub · 개인 코드 보관용</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-</head>
-<body>
-
-<div id="app">
-
-<div id="left">
-<h3>글목록</h3>
-
-<ul id="list"></ul>
-
-<button onclick="loadPosts()">새로고침</button>
-
-</div>
-
-<div id="right">
-
-<input id="title" placeholder="제목">
-
-<textarea id="content" placeholder="내용"></textarea>
-
-<br>
-
-<button onclick="save()">저장</button>
-<button onclick="del()">삭제</button>
-
-</div>
-
+<div class="toast" id="toast">
+    클립보드에 복사했습니다.
 </div>
 
 <script>
 
-const PASSWORD = "878787";
+/* =====================================
+   Supabase 설정
+===================================== */
 
-function checkPassword(){
+const SUPABASE_URL =
+"https://nokkpkrgwashmjykgpha.supabase.co";
 
-    const pw = prompt("암호를 입력하세요");
+const SUPABASE_ANON_KEY =
+"sb_publishable_aSoCddigVMqoOL7b5kbJ6w_WrWuSMVT";
 
-    if(pw === PASSWORD){
-    
+const db = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
 
-        document.body.style.display = "block";
-        document.getElementById("app").style.display = "flex";
-        loadPosts();
+/* =====================================
+   방문자 ID 생성
+===================================== */
 
-    }else{
+function getVisitorId(){
 
-        document.body.innerHTML = `
-        <div style="
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            height:100vh;
-            font-size:30px;
-            background:#111827;
-            color:white;">
-            접근이 거부되었습니다.
-        </div>`;
+    let id = localStorage.getItem("it_hub_visitor_id");
+
+    if(!id){
+        id = crypto.randomUUID();
+        localStorage.setItem("it_hub_visitor_id",id);
+    }
+
+    return id;
+}
+
+/* =====================================
+   방문자 통계
+===================================== */
+
+async function updateVisitorStats(countPageView = false){
+
+    try{
+
+        const visitorId = getVisitorId();
+
+        const {data,error} = await db.rpc(
+            "track_it_hub_visit",
+            {
+                p_visitor_id:visitorId,
+                p_count_page_view:countPageView
+            }
+        );
+
+        if(error) throw error;
+
+        document.getElementById("totalVisitors").textContent =
+            Number(data.total_visitors || 0).toLocaleString();
+
+        document.getElementById("todayVisitors").textContent =
+            Number(data.today_visitors || 0).toLocaleString();
+
+        document.getElementById("pageViews").textContent =
+            Number(data.page_views || 0).toLocaleString();
+
+        document.getElementById("activeVisitors").textContent =
+            Number(data.active_visitors || 0).toLocaleString();
+
+        document.querySelectorAll(".stat-value").forEach(el=>{
+            el.classList.remove("loading");
+        });
+
+    }catch(error){
+
+        console.error("방문자 통계 오류:",error);
+
+        [
+            "totalVisitors",
+            "todayVisitors",
+            "pageViews",
+            "activeVisitors"
+        ].forEach(id=>{
+            document.getElementById(id).textContent = "연결 오류";
+        });
 
     }
 
 }
 
-const url="https://nokkpkrgwashmjykgpha.supabase.co";
-const key="sb_publishable_aSoCddigVMqoOL7b5kbJ6w_WrWuSMVT";
+/* 최초 페이지 접속: 조회수 증가 */
+updateVisitorStats(true);
 
-const db=supabase.createClient(url,key);
+/* 30초마다 접속 상태 갱신 */
+setInterval(()=>{
+    updateVisitorStats(false);
+},30000);
 
-let current=null;
+/* =====================================
+   코드 복사
+===================================== */
 
-async function loadPosts(){
+async function copyCode(id,button){
 
-    const {data}=await db
-    .from("posts")
-    .select("*")
-    .order("id");
+    const text = document.getElementById(id).textContent;
 
-    list.innerHTML="";
+    try{
 
-    (data||[]).forEach(r=>{
+        await navigator.clipboard.writeText(text);
 
-        let li=document.createElement("li");
+        button.textContent = "✓ 복사 완료";
 
-        li.textContent=r.title;
+        document.getElementById("toast")
+            .classList.add("show");
 
-        li.onclick=()=>{
+        setTimeout(()=>{
 
-            current=r.id;
+            button.textContent = "📋 코드 전체 복사";
 
-            title.value=r.title;
-            content.value=r.content;
+            document.getElementById("toast")
+                .classList.remove("show");
 
-        };
+        },1600);
 
-        list.appendChild(li);
+    }catch(e){
+
+        const area = document.createElement("textarea");
+
+        area.value = text;
+
+        document.body.appendChild(area);
+
+        area.select();
+
+        const ok = document.execCommand("copy");
+
+        area.remove();
+
+        if(ok){
+
+            button.textContent = "✓ 복사 완료";
+
+            setTimeout(()=>{
+                button.textContent = "📋 코드 전체 복사";
+            },1600);
+
+        }else{
+
+            alert("복사에 실패했습니다. 코드를 선택해 직접 복사해 주세요.");
+
+        }
+
+    }
+
+}
+
+/* =====================================
+   검색 및 카테고리 필터
+===================================== */
+
+let filter = "all";
+
+function update(){
+
+    const q = document
+        .getElementById("search")
+        .value.toLowerCase();
+
+    let shown = 0;
+
+    document.querySelectorAll(".memo").forEach(card=>{
+
+        const typeOK =
+            filter === "all" ||
+            card.dataset.type === filter;
+
+        const textOK =
+            card.innerText.toLowerCase().includes(q);
+
+        card.style.display =
+            typeOK && textOK ? "" : "none";
+
+        if(typeOK && textOK) shown++;
 
     });
 
-}
-
-async function save(){
-
-    let obj={
-        title:title.value,
-        content:content.value
-    };
-
-    if(current){
-
-        await db
-        .from("posts")
-        .update(obj)
-        .eq("id",current);
-
-    }else{
-
-        await db
-        .from("posts")
-        .insert(obj);
-
-    }
-
-    current=null;
-
-    title.value="";
-    content.value="";
-
-    loadPosts();
+    document.getElementById("empty").style.display =
+        shown ? "none" : "block";
 
 }
 
-async function del(){
+/* 카테고리 */
+document.querySelectorAll(".tab").forEach(tab=>{
 
-    if(!current) return;
+    tab.addEventListener("click",()=>{
 
-    await db
-    .from("posts")
-    .delete()
-    .eq("id",current);
+        document.querySelectorAll(".tab")
+            .forEach(t=>t.classList.remove("active"));
 
-    current=null;
+        tab.classList.add("active");
 
-    title.value="";
-    content.value="";
+        filter = tab.dataset.filter;
 
-    loadPosts();
+        update();
 
-}
+    });
 
-checkPassword();
+});
+
+/* 검색 */
+document.getElementById("search")
+    .addEventListener("input",update);
 
 </script>
 
